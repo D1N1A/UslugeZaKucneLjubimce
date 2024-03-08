@@ -1,8 +1,17 @@
+import  { Route, Routes } from "react-router-dom"
+import Pocetna from "./pages/Pocetna"
+import { RoutesNames } from "./constants"
+import NavBar from "./components/NavBar"
 
-function App() {
+function App () {
   return (
     <>
-      Hello world
+      <NavBar />
+      <Routes>
+        <>
+        <Route path={RoutesNames.HOME} element={<Pocetna />} />
+        </>
+      </Routes>
     </>
   )
 }
