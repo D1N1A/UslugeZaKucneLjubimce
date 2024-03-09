@@ -1,5 +1,6 @@
 export const RoutesNames = {
-    HOME: '/'
+    HOME: '/' ,
+    STATUSIREZERVACIJA_PREGLED: '/statusirezervacija'
 
 
 };
