@@ -106,7 +106,7 @@ namespace UslugeZaKucneLjubimce.Controllers
         /// {
         ///  "sifra": 0,
         ///  "naziv": "Novi naziv",
-        ///  "boja": "crvena",
+        ///  "pokazatelj": "crvena",
         /// }
         ///
         /// </remarks>
@@ -144,7 +144,7 @@ namespace UslugeZaKucneLjubimce.Controllers
                 // inače ovo rade mapperi
                 // za sada ručno
                 statusRezervacijeIzBaze.Naziv = statusRezervacije.Naziv;
-                statusRezervacijeIzBaze.Boja= statusRezervacije.Boja;
+                statusRezervacijeIzBaze.Pokazatelj= statusRezervacije.Pokazatelj;
     
  
 
