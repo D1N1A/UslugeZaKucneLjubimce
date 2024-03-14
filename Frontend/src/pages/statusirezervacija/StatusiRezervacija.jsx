@@ -2,40 +2,43 @@ import { useEffect, useState } from "react";
 import { Container, Table } from "react-bootstrap";
 import StatusRezervacijeService from "../../services/StatusRezervacijeService";
 
+export default function StatusiRezervacija() {
+    const [statusiRezervacija, setStatusiRezervacije] = useState([]);
 
-export default function StatusiRezervacija (){
-    const [statusiRezervacija,setStatusiRezervacije] = useState();
-
-    async function dohvatiStatuseRezervacija(){
-        await StatusRezervacijeService.getStatusiRezervacija()
-        .then((res)=>{
+    async function dohvatiStatuseRezervacija() {
+        try {
+            const res = await StatusRezervacijeService.getStatusiRezervacija();
             setStatusiRezervacije(res.data);
-        })
-        .catch((e)=>{
-            alert(e);
-        });
+        } catch (error) {
+            alert(error);
+        }
     }
 
-    useEffect(()=>{
+    useEffect(() => {
         dohvatiStatuseRezervacija();
-    },[]);
-   
-    
-    return (
+    }, []);
 
+    function pokazateljTitle(statusrezervacije) {
+        if (statusrezervacije.pokazatelj == null) return 'Zahtjev na čekanju';
+        if (statusrezervacije.pokazatelj) return 'Zahtjev obrađen';
+        return 'Zahtjev u obradi';
+    }
+
+    return (
         <Container>
             <Table striped bordered hover responsive>
                 <thead>
-                    <tr> 
-                        <th>Naziv</th>
+                    <tr>
+                        <th>Stanje</th>
                         <th>Pokazatelj</th>
-                     </tr>
+                        <th>Akcija</th>
+                    </tr>
                 </thead>
                 <tbody>
-                    {statusiRezervacija && statusiRezervacija.map((statusrezervacije,index)=>(
+                    {statusiRezervacija && statusiRezervacija.map((statusrezervacije, index) => (
                         <tr key={index}>
-                            <td>{statusrezervacije.naziv}</td>
-                            <td>{statusrezervacije.pokazatelj}</td>
+                            <td>{statusrezervacije.stanje}</td>
+                            <td>{pokazateljTitle(statusrezervacije)}</td>
                             <td>Akcija</td>
                         </tr>
                     ))}

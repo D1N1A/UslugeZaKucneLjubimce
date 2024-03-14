@@ -68,7 +68,7 @@ namespace UslugeZaKucneLjubimce.Controllers
         /// </summary>
         /// <remarks>
         ///     POST api/v1/StatusRezervacije
-        ///     {naziv: "Primjer naziva"}
+        ///     {stanje: "Primjer stanja"}
         /// </remarks>
         /// <param name="status rezervacije">Status rezervacije za unijeti u JSON formatu</param>
         /// <response code="201">Kreirano</response>
@@ -105,20 +105,21 @@ namespace UslugeZaKucneLjubimce.Controllers
         ///
         /// {
         ///  "sifra": 0,
-        ///  "naziv": "Novi naziv",
+        ///  "stanje": "true",
         ///  "pokazatelj": "crvena",
         /// }
         ///
         /// </remarks>
         /// <param name="sifra">Šifra statusa rezervacije koji se mijenja</param>  
-        /// <param name="smjer">Status rezervacije za unijeti u JSON formatu</param>  
+        /// <param name="stanje">Status rezervacije za unijeti u JSON formatu</param> 
+        /// <param name="pokazatelj">Boja rezervacije za unijeti u JSON formatu</param>  
         /// <returns>Svi poslani podaci od statusa rezervacije koji su spremljeni u bazi</returns>
         /// <response code="200">Sve je u redu</response>
         /// <response code="204">Nema u bazi statusa rezervacije kojeg želimo promijeniti</response>
         /// <response code="415">Nismo poslali JSON</response> 
         /// <response code="503">Baza nedostupna</response> 
 
-        
+
         [HttpPut]
         [Route("{sifra:int}")]
         public IActionResult Put(int sifra, StatusRezervacije statusRezervacije)
@@ -143,7 +144,7 @@ namespace UslugeZaKucneLjubimce.Controllers
 
                 // inače ovo rade mapperi
                 // za sada ručno
-                statusRezervacijeIzBaze.Naziv = statusRezervacije.Naziv;
+                statusRezervacijeIzBaze.Stanje = statusRezervacije.Stanje;
                 statusRezervacijeIzBaze.Pokazatelj= statusRezervacije.Pokazatelj;
     
  
@@ -187,14 +188,14 @@ namespace UslugeZaKucneLjubimce.Controllers
 
             try
             {
-                var smjerIzbaze = _context.StatusiRezervacija.Find(sifra);
+                var statusRezervacijeIzbaze = _context.StatusiRezervacija.Find(sifra);
 
-                if (smjerIzbaze == null)
+                if (statusRezervacijeIzbaze == null)
                 {
                     return StatusCode(StatusCodes.Status204NoContent, sifra);
                 }
 
-                _context.StatusiRezervacija.Remove(smjerIzbaze);
+                _context.StatusiRezervacija.Remove(statusRezervacijeIzbaze);
                 _context.SaveChanges();
 
                 return new JsonResult("{\"poruka\": \"Obrisano\"}"); // ovo nije baš najbolja praksa ali da znake kako i to može

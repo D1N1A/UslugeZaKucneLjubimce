@@ -5,18 +5,20 @@ namespace UslugeZaKucneLjubimce.Models
     /// <summary>
     /// Ovo mi je POCO koji je mapiran na bazu
     /// </summary>
-    public class StatusRezervacije:Entitet
+    public class StatusRezervacije : Entitet
     {
         /// <summary>
-        /// Naziv u bazi
+        /// Stanje u bazi
         /// </summary>
-        [Required(ErrorMessage ="Unesite naziv usluge")]
-        public string? Naziv { get; set; }
+        [Required(ErrorMessage = "Unesite stanje obrade u bazi")]
+        public bool? Stanje { get; set; }
+
         /// <summary>
         /// Potrebno je unijeti boju pomoću stringa
         /// </summary>
         [Required(ErrorMessage = "Pokazatelj statusa obavezna")]
-       
+
         public string Pokazatelj { get; set; }
+
     }
 }
