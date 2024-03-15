@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Container, Table } from "react-bootstrap";
+import { GrValidate } from "react-icons/gr";
 import StatusRezervacijeService from "../../services/StatusRezervacijeService";
 
 export default function StatusiRezervacija() {
@@ -17,6 +18,12 @@ export default function StatusiRezervacija() {
     useEffect(() => {
         dohvatiStatuseRezervacija();
     }, []);
+
+    function stanje(statusrezervacije) {
+        if (statusrezervacije.stanje == null) return "gray";
+        if (statusrezervacije.stanje) return "green";
+        return "red";
+    }
 
     function pokazateljTitle(statusrezervacije) {
         if (statusrezervacije.pokazatelj == null) return 'Zahtjev na čekanju';
@@ -37,8 +44,13 @@ export default function StatusiRezervacija() {
                 <tbody>
                     {statusiRezervacija && statusiRezervacija.map((statusrezervacije, index) => (
                         <tr key={index}>
-                            <td>{statusrezervacije.stanje}</td>
-                            <td>{pokazateljTitle(statusrezervacije)}</td>
+                            <td>
+                                <GrValidate
+                                    color={stanje(statusrezervacije)}
+                                    title={pokazateljTitle(statusrezervacije)}
+                                />
+                            </td>
+                            <td>{statusrezervacije.pokazatelj}</td>
                             <td>Akcija</td>
                         </tr>
                     ))}
