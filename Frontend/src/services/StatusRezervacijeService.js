@@ -12,6 +12,20 @@ async function getStatusiRezervacija(){
     });
 }
 
+async function obrisiStatusRezervacije(sifra){
+    return await httpService.delete('/StatusRezervacije/' + sifra)
+    .then((res)=> {
+
+        return {ok: true, poruka: res};
+    }).catch((e)=>{
+        console.log(e);
+    });
+}
+
+
+
 export default{
-    getStatusiRezervacija
+    getStatusiRezervacija,
+    obrisiStatusRezervacije
+  
 };

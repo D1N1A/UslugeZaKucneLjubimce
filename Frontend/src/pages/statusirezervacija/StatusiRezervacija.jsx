@@ -1,28 +1,34 @@
 import React, { useEffect, useState } from "react";
-import { Container, Table } from "react-bootstrap";
+import { Button, Container, Table } from "react-bootstrap";
 import { GrValidate } from "react-icons/gr";
 import { TiDocumentAdd } from "react-icons/ti";
 import { CiEdit } from "react-icons/ci";
 import { MdDelete } from "react-icons/md";
 import { Link } from "react-router-dom"; 
 import StatusRezervacijeService from "../../services/StatusRezervacijeService";
-import { RoutesNames } from "../../constants";
+import { RoutesNames } from "../../constants"
 
 export default function StatusiRezervacija() {
-    const [statusiRezervacija, setStatusiRezervacije] = useState([]);
+    const [statusiRezervacija, setStatusRezervacije] = useState([]);
 
     async function dohvatiStatuseRezervacija() {
-        try {
-            const res = await StatusRezervacijeService.getStatusiRezervacija();
-            setStatusiRezervacije(res.data);
-        } catch (error) {
-            console.error(error); 
-        }
+        await StatusRezervacijeService.getStatusiRezervacija()
+        .then((res)=>{
+            setStatusRezervacije(res.data);
+        })
+        .catch((e)=>{
+            alert(e);
+        });
     }
+    
 
+    
     useEffect(() => {
         dohvatiStatuseRezervacija();
     }, []);
+
+
+
 
     function stanje(statusrezervacije) {
         if (statusrezervacije.stanje === null) return "gray";
@@ -36,7 +42,23 @@ export default function StatusiRezervacija() {
         return 'Zahtjev u obradi';
     }
 
+    async function obrisi(statusrezervacije) {
+        try {
 
+            console.log('Brisanje statusa rezervacije:', statusrezervacije);
+        } catch (error) {
+            console.error('Greška prilikom brisanja statusa rezervacije:', error);
+        }
+    }
+
+    async function obrisiStatusRezervacije(sifra) {
+        const odgovor = await StatusRezervacijeService.obrisiStatusRezervacije(sifra);
+        if (odgovor.ok){
+            alert(odgovor.poruka.data.poruka);
+            dohvatiStatuseRezervacija();
+        }
+        
+    }
 
     return (
         <Container>
@@ -52,8 +74,8 @@ export default function StatusiRezervacija() {
                     </tr>
                 </thead>
                 <tbody>
-                    {statusiRezervacija && statusiRezervacija.map((statusrezervacije) => (
-                        <tr key={statusrezervacije.id}>
+                    {statusiRezervacija && statusiRezervacija.map((statusrezervacije, index) => (
+                        <tr key={index}>
                             <td className="sredina">
                                 <GrValidate
                                     size={25}
@@ -64,16 +86,15 @@ export default function StatusiRezervacija() {
                             <td className="sredina">{statusrezervacije.pokazatelj}</td>
                             <td className="sredina">
                                 <Link to={RoutesNames.STATUSIREZERVACIJA_PROMIJENI}>
-                                 <CiEdit
-                                 size={25}
-                                 /> 
-                                 </Link>
-                                 &nbsp;
-                                 <Link onClick={obrisi(statusrezervacije)}>
-                                 <MdDelete
-                                 size={25}
-                                 /> 
-                                 </Link>
+                                    <CiEdit size={25} />
+                                </Link>
+                                &nbsp; &nbsp; &nbsp; 
+                                <Button
+                                    variant = "danger"
+                                    onClick={()=>obrisiStatusRezervacije(statusrezervacije.sifra)}
+                                    >
+                                    <MdDelete size={25} />
+                                </Button>
                             </td>
                         </tr>
                     ))}
@@ -81,4 +102,4 @@ export default function StatusiRezervacija() {
             </Table>
         </Container>
     );
-}
+};

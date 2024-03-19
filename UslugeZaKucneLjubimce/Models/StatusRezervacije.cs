@@ -14,7 +14,7 @@ namespace UslugeZaKucneLjubimce.Models
         public bool? Stanje { get; set; }
 
         /// <summary>
-        /// Potrebno je unijeti boju pomoću stringa
+        /// Potrebno je unijeti stanje
         /// </summary>
         [Required(ErrorMessage = "Pokazatelj statusa obavezna")]
 
