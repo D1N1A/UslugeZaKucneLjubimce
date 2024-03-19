@@ -44,8 +44,8 @@ statusirezervacija int not null
 
 create table statusirezervacija (
 sifra int not null primary key identity(1,1),
-stanje bit,
-pokazatelj varchar (10) not null
+pokazatelj bit,
+stanje varchar (50) not null
 );
 
 create table operateri (
