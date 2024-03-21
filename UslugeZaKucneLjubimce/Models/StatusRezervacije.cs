@@ -11,14 +11,14 @@ namespace UslugeZaKucneLjubimce.Models
         /// Stanje u bazi
         /// </summary>
         [Required(ErrorMessage = "Unesite stanje obrade u bazi")]
-        public bool? Stanje { get; set; }
+        public bool? Pokazatelj { get; set; }
 
         /// <summary>
         /// Potrebno je unijeti stanje
         /// </summary>
         [Required(ErrorMessage = "Pokazatelj statusa obavezna")]
 
-        public string Pokazatelj { get; set; }
+        public string Stanje { get; set; }
 
     }
 }

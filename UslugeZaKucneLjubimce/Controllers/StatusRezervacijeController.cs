@@ -72,7 +72,7 @@ namespace UslugeZaKucneLjubimce.Controllers
         /// </remarks>
         /// <param name="status rezervacije">Status rezervacije za unijeti u JSON formatu</param>
         /// <response code="201">Kreirano</response>
-        /// <response code="400">Zahtjev nije valjan (BadRequest)</response> 
+
         /// <response code="503">Baza nedostupna iz razno raznih razloga</response> 
         /// <returns>Status rezervacije s šifrom koju je dala baza</returns>
         [HttpPost]

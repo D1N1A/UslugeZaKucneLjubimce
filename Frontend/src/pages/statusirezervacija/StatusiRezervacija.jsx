@@ -31,14 +31,14 @@ export default function StatusiRezervacija() {
 
 
     function stanje(statusrezervacije) {
-        if (statusrezervacije.stanje === null) return "gray";
-        if (statusrezervacije.stanje) return "green";
+        if (statusrezervacije.pokazatelj === null) return "gray";
+        if (statusrezervacije.pokazatelj) return "green";
         return "red";
     }
 
-    function pokazateljTitle(statusrezervacije) {
-        if (statusrezervacije.pokazatelj === null) return 'Zahtjev na čekanju';
-        if (statusrezervacije.pokazatelj) return 'Zahtjev obrađen';
+    function stanjeTitle(statusrezervacije) {
+        if (statusrezervacije.stanje === null) return 'Zahtjev na čekanju';
+        if (statusrezervacije.stanje) return 'Zahtjev obrađen';
         return 'Zahtjev u obradi';
     }
 
@@ -68,8 +68,8 @@ export default function StatusiRezervacija() {
             <Table striped bordered hover responsive>
                 <thead>
                     <tr>
-                        <th className="sredina">Stanje</th>
                         <th className="sredina">Pokazatelj</th>
+                        <th className="sredina">Stanje</th>
                         <th className="sredina">Akcija</th>
                     </tr>
                 </thead>
@@ -79,8 +79,8 @@ export default function StatusiRezervacija() {
                             <td className="sredina">
                                 <GrValidate
                                     size={25}
-                                    color={stanje(statusrezervacije)}
-                                    title={pokazateljTitle(statusrezervacije)}
+                                    color={pokazatelj(statusrezervacije)}
+                                    title={stanjeTitle(statusrezervacije)}
                                 />
                             </td>
                             <td className="sredina">{statusrezervacije.pokazatelj}</td>
