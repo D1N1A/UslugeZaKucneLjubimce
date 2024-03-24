@@ -30,15 +30,15 @@ export default function StatusiRezervacija() {
 
 
 
-    function stanje(statusrezervacije) {
+    function pokazatelj(statusrezervacije) {
         if (statusrezervacije.pokazatelj === null) return "gray";
         if (statusrezervacije.pokazatelj) return "green";
         return "red";
     }
 
-    function stanjeTitle(statusrezervacije) {
-        if (statusrezervacije.stanje === null) return 'Zahtjev na čekanju';
-        if (statusrezervacije.stanje) return 'Zahtjev obrađen';
+    function pokazateljTitle(statusrezervacije) {
+        if (statusrezervacije.pokazatelj === null) return 'Zahtjev na čekanju';
+        if (statusrezervacije.pokazatelj) return 'Zahtjev obrađen';
         return 'Zahtjev u obradi';
     }
 
@@ -74,31 +74,31 @@ export default function StatusiRezervacija() {
                     </tr>
                 </thead>
                 <tbody>
-                    {statusiRezervacija && statusiRezervacija.map((statusrezervacije, index) => (
-                        <tr key={index}>
-                            <td className="sredina">
-                                <GrValidate
-                                    size={25}
-                                    color={pokazatelj(statusrezervacije)}
-                                    title={stanjeTitle(statusrezervacije)}
-                                />
-                            </td>
-                            <td className="sredina">{statusrezervacije.pokazatelj}</td>
-                            <td className="sredina">
-                                <Link to={RoutesNames.STATUSIREZERVACIJA_PROMIJENI}>
-                                    <CiEdit size={25} />
-                                </Link>
-                                &nbsp; &nbsp; &nbsp; 
-                                <Button
-                                    variant = "danger"
-                                    onClick={()=>obrisiStatusRezervacije(statusrezervacije.sifra)}
-                                    >
-                                    <MdDelete size={25} />
-                                </Button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
+    {statusiRezervacija && statusiRezervacija.map((statusrezervacije, index) => (
+        <tr key={index}>
+            <td className="sredina">
+                <GrValidate
+                    size={25}
+                    color={pokazatelj(statusrezervacije)}
+                    title={pokazateljTitle(statusrezervacije)} 
+                />
+            </td>
+            <td className="sredina">{pokazateljTitle(statusrezervacije)}</td>
+            <td className="sredina">
+                <Link to={RoutesNames.STATUSIREZERVACIJA_PROMIJENI}>
+                    <CiEdit size={25} />
+                </Link>
+                &nbsp; &nbsp; &nbsp; 
+                <Button
+                    variant="danger"
+                    onClick={() => obrisiStatusRezervacije(statusrezervacije.sifra)}
+                >
+                    <MdDelete size={25} />
+                </Button>
+            </td>
+        </tr>
+    ))}
+</tbody>
             </Table>
         </Container>
     );

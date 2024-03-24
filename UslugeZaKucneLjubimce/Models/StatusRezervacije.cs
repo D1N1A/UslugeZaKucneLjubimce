@@ -10,7 +10,7 @@ namespace UslugeZaKucneLjubimce.Models
         /// <summary>
         /// Stanje u bazi
         /// </summary>
-        [Required(ErrorMessage = "Unesite stanje obrade u bazi")]
+
         public bool? Pokazatelj { get; set; }
 
         /// <summary>
