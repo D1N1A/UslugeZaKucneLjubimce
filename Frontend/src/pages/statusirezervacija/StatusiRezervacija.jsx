@@ -39,7 +39,7 @@ export default function StatusiRezervacija() {
     async function obrisiStatusRezervacije(sifra){
       const odgovor =   await StatusRezervacijeService.obrisiStatusRezervacije(sifra);
       if (odgovor.ok){
-        alert(odgovor.poruka.data.poruka);
+        console(odgovor.poruka.data);
         dohvatiStatuseRezervacija();
       }
     }

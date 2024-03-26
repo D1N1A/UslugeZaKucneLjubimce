@@ -28,8 +28,20 @@ async function dodajStatusRezervacije(statusrezervacije) {
         return {ok: true, poruka: 'Uspješno dodano'}
     })
     .catch((e)=>{
-        console.log(e.response.data.errors);
-        return {ok: false, poruka: e.response.data}
+      //  console.log(e.response.data.errors);
+        return {ok: false, poruka: 'Greška'}
+    });
+    return odgovor;
+}
+
+async function promijeniStatusRezervacije(sifra,statusrezervacije) {
+    const odgovor = await httpService.put('/StatusRezervacije'+ sifra, statusrezervacije)
+    .then(()=>{
+        return {ok: true, poruka: 'Uspješno promijenjeno'}
+    })
+    .catch((e)=>{
+      //  console.log(e.response.data.errors);
+        return {ok: false, poruka: 'Greška'}
     });
     return odgovor;
 }
@@ -39,6 +51,7 @@ async function dodajStatusRezervacije(statusrezervacije) {
 export default{
     getStatusiRezervacija,
     obrisiStatusRezervacije,
-    dodajStatusRezervacije
+    dodajStatusRezervacije,
+    promijeniStatusRezervacije
   
 };
