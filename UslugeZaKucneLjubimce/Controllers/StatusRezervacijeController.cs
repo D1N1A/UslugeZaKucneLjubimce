@@ -105,8 +105,8 @@ namespace UslugeZaKucneLjubimce.Controllers
         ///
         /// {
         ///  "sifra": 0,
-        ///  "stanje": "true",
-        ///  "pokazatelj": "crvena",
+        ///  "pokazatelj": "true",
+        ///  "stanje": "OK",
         /// }
         ///
         /// </remarks>
@@ -198,7 +198,7 @@ namespace UslugeZaKucneLjubimce.Controllers
                 _context.StatusiRezervacija.Remove(statusRezervacijeIzbaze);
                 _context.SaveChanges();
 
-                return new JsonResult("{\"poruka\": \"Obrisano\"}"); // ovo nije baš najbolja praksa ali da znake kako i to može
+                return new JsonResult( new { poruka = "Obrisano" }); 
 
             }
             catch (Exception ex)

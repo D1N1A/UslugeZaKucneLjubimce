@@ -8,17 +8,16 @@ namespace UslugeZaKucneLjubimce.Models
     public class StatusRezervacije : Entitet
     {
         /// <summary>
-        /// Stanje u bazi
+        ///     Unesite pokazatelja
         /// </summary>
 
         public bool? Pokazatelj { get; set; }
 
         /// <summary>
-        /// Potrebno je unijeti stanje
+        /// Potrebno unjeti stanje
         /// </summary>
-        [Required(ErrorMessage = "Pokazatelj statusa obavezna")]
 
-        public string Stanje { get; set; }
+        public string? Stanje { get; set; }
 
     }
 }

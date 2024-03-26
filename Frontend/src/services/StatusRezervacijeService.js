@@ -22,10 +22,23 @@ async function obrisiStatusRezervacije(sifra){
     });
 }
 
+async function dodajStatusRezervacije(statusrezervacije) {
+    const odgovor = await httpService.post('/StatusRezervacije', statusrezervacije)
+    .then(()=>{
+        return {ok: true, poruka: 'Uspješno dodano'}
+    })
+    .catch((e)=>{
+        console.log(e.response.data.errors);
+        return {ok: false, poruka: e.response.data}
+    });
+    return odgovor;
+}
+
 
 
 export default{
     getStatusiRezervacija,
-    obrisiStatusRezervacije
+    obrisiStatusRezervacije,
+    dodajStatusRezervacije
   
 };

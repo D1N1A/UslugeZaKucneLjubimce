@@ -6,29 +6,23 @@ import { CiEdit } from "react-icons/ci";
 import { MdDelete } from "react-icons/md";
 import { Link } from "react-router-dom"; 
 import StatusRezervacijeService from "../../services/StatusRezervacijeService";
-import { RoutesNames } from "../../constants"
+import { RoutesNames } from "../../constants";
 
 export default function StatusiRezervacija() {
     const [statusiRezervacija, setStatusRezervacije] = useState([]);
 
     async function dohvatiStatuseRezervacija() {
-        await StatusRezervacijeService.getStatusiRezervacija()
-        .then((res)=>{
+        try {
+            const res = await StatusRezervacijeService.getStatusiRezervacija();
             setStatusRezervacije(res.data);
-        })
-        .catch((e)=>{
-            alert(e);
-        });
+        } catch (error) {
+            alert(error);
+        }
     }
-    
-
     
     useEffect(() => {
         dohvatiStatuseRezervacija();
     }, []);
-
-
-
 
     function pokazatelj(statusrezervacije) {
         if (statusrezervacije.pokazatelj === null) return "gray";
@@ -42,22 +36,12 @@ export default function StatusiRezervacija() {
         return 'Zahtjev u obradi';
     }
 
-    async function obrisi(statusrezervacije) {
-        try {
-
-            console.log('Brisanje statusa rezervacije:', statusrezervacije);
-        } catch (error) {
-            console.error('Greška prilikom brisanja statusa rezervacije:', error);
-        }
-    }
-
-    async function obrisiStatusRezervacije(sifra) {
-        const odgovor = await StatusRezervacijeService.obrisiStatusRezervacije(sifra);
-        if (odgovor.ok){
-            alert(odgovor.poruka.data.poruka);
-            dohvatiStatuseRezervacija();
-        }
-        
+    async function obrisiStatusRezervacije(sifra){
+      const odgovor =   await StatusRezervacijeService.obrisiStatusRezervacije(sifra);
+      if (odgovor.ok){
+        alert(odgovor.poruka.data.poruka);
+        dohvatiStatuseRezervacija();
+      }
     }
 
     return (
@@ -74,31 +58,31 @@ export default function StatusiRezervacija() {
                     </tr>
                 </thead>
                 <tbody>
-    {statusiRezervacija && statusiRezervacija.map((statusrezervacije, index) => (
-        <tr key={index}>
-            <td className="sredina">
-                <GrValidate
-                    size={25}
-                    color={pokazatelj(statusrezervacije)}
-                    title={pokazateljTitle(statusrezervacije)} 
-                />
-            </td>
-            <td className="sredina">{pokazateljTitle(statusrezervacije)}</td>
-            <td className="sredina">
-                <Link to={RoutesNames.STATUSIREZERVACIJA_PROMIJENI}>
-                    <CiEdit size={25} />
-                </Link>
-                &nbsp; &nbsp; &nbsp; 
-                <Button
-                    variant="danger"
-                    onClick={() => obrisiStatusRezervacije(statusrezervacije.sifra)}
-                >
-                    <MdDelete size={25} />
-                </Button>
-            </td>
-        </tr>
-    ))}
-</tbody>
+                    {statusiRezervacija && statusiRezervacija.map((statusrezervacije, index) => (
+                        <tr key={index}>
+                            <td className="sredina">
+                                <GrValidate
+                                    size={25}
+                                    color={pokazatelj(statusrezervacije)}
+                                    title={pokazateljTitle(statusrezervacije)} 
+                                />
+                            </td>
+                            <td className="sredina">{statusrezervacije.stanje ? statusrezervacije.stanje : pokazateljTitle(statusrezervacije)}</td>
+                            <td className="sredina">
+                                <Link to={RoutesNames.STATUSIREZERVACIJA_PROMIJENI}>
+                                    <CiEdit size={25} />
+                                </Link>
+                                &nbsp; &nbsp; &nbsp; 
+                                <Button
+                                    variant="danger"
+                                    onClick={() => obrisiStatusRezervacije(statusrezervacije.sifra)}
+                                >
+                                    <MdDelete size={25} />
+                                </Button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
             </Table>
         </Container>
     );
