@@ -46,12 +46,27 @@ async function promijeniStatusRezervacije(sifra,statusrezervacije) {
     return odgovor;
 }
 
+async function getBySifra(sifra){
+    return await httpService.get('/StatusRezervacije/' + sifra)
+    .then((res)=>{
+        if(App.DEV) console.table(res.data);
+
+        return res;
+    }).catch((e)=>{
+        console.log(e);
+        return {poruka: e}
+    });
+}
+
+
+
 
 
 export default{
     getStatusiRezervacija,
     obrisiStatusRezervacije,
     dodajStatusRezervacije,
-    promijeniStatusRezervacije
+    promijeniStatusRezervacije,
+    getBySifra
   
 };

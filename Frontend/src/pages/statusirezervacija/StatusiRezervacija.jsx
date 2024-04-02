@@ -4,12 +4,13 @@ import { GrValidate } from "react-icons/gr";
 import { TiDocumentAdd } from "react-icons/ti";
 import { CiEdit } from "react-icons/ci";
 import { MdDelete } from "react-icons/md";
-import { Link } from "react-router-dom"; 
+import { Link, useNavigate } from "react-router-dom"; 
 import StatusRezervacijeService from "../../services/StatusRezervacijeService";
 import { RoutesNames } from "../../constants";
 
 export default function StatusiRezervacija() {
     const [statusiRezervacija, setStatusRezervacije] = useState([]);
+    const navigate = useNavigate();
 
     async function dohvatiStatuseRezervacija() {
         try {
@@ -69,9 +70,11 @@ export default function StatusiRezervacija() {
                             </td>
                             <td className="sredina">{statusrezervacije.stanje ? statusrezervacije.stanje : pokazateljTitle(statusrezervacije)}</td>
                             <td className="sredina">
-                                <Link to={RoutesNames.STATUSIREZERVACIJA_PROMIJENI}>
+                                <Button 
+                                variant=""
+                                onClick={()=>{navigate(`/statusirezervacija/${statusrezervacije.sifra}`)}}>
                                     <CiEdit size={25} />
-                                </Link>
+                                </Button>
                                 &nbsp; &nbsp; &nbsp; 
                                 <Button
                                     variant="danger"

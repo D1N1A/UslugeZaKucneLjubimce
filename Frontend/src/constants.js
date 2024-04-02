@@ -2,7 +2,7 @@ export const RoutesNames = {
     HOME: '/' ,
     STATUSIREZERVACIJA_PREGLED: '/statusirezervacija',
     STATUSIREZERVACIJA_NOVI: '/statusirezervacija/dodaj',
-    STATUSIREZERVACIJA_PROMIJENI: 'statusirezervacija/promijeni'
+    STATUSIREZERVACIJA_PROMIJENI: 'statusirezervacija/:sifra'
 
 };
 
