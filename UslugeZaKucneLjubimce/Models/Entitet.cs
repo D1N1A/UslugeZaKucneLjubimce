@@ -6,7 +6,7 @@ namespace UslugeZaKucneLjubimce.Models
     /// Ovo je vršna nadklasa koja služi za osnovne atribute
     /// tipa sifra, operater, datum unosa, promjene itd.
     /// </summary>
-    public class Entitet
+    public abstract class Entitet
     {
 
         /// <summary>

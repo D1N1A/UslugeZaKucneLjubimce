@@ -7,6 +7,9 @@ import './App.css';
 import StatusiRezervacija from "./pages/statusirezervacija/StatusiRezervacija"
 import StatusiRezervacijaDodaj from "./pages/statusirezervacija/StatusiRezervacijaDodaj" 
 import StatusiRezervacijaPromijeni from "./pages/statusirezervacija/StatusiRezervacijaPromijeni"
+import PruzateljiUsluga from "./pages/pruzateljiusluga/PruzateljiUsluga"
+import PruzateljiUslugaDodaj from "./pages/pruzateljiusluga/PruzateljiUslugaDodaj"
+import PruzateljiUslugaPromijeni from "./pages/pruzateljiusluga/PruzateljiUslugaPromijeni"
 
 
 
@@ -22,6 +25,9 @@ function App () {
         <Route path={RoutesNames.STATUSIREZERVACIJA_PREGLED} element={<StatusiRezervacija />} />
         <Route path={RoutesNames.STATUSIREZERVACIJA_NOVI} element={<StatusiRezervacijaDodaj />} />
         <Route path={RoutesNames.STATUSIREZERVACIJA_PROMIJENI} element={<StatusiRezervacijaPromijeni />} />
+        <Route path={RoutesNames.PRUZATELJIUSLUGA_PREGLED} element={<PruzateljiUsluga />} />
+        <Route path={RoutesNames.PRUZATELJIUSLUGA_NOVI} element={<PruzateljiUslugaDodaj />} />
+        <Route path={RoutesNames.PRUZATELJIUSLUGA_PROMIJENI} element={<PruzateljiUslugaPromijeni />} />
         </>
       </Routes>
     </>

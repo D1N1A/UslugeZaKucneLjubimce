@@ -1,10 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using UslugeZaKucneLjubimce.Data;
+using UslugeZaKucneLjubimce.Extensions;
 using UslugeZaKucneLjubimce.Models;
 
 namespace UslugeZaKucneLjubimce.Controllers
@@ -23,13 +20,23 @@ namespace UslugeZaKucneLjubimce.Controllers
         [HttpGet]
         public IActionResult Get()
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             try
             {
-                var pruzateljiUsluga = _context.PruzateljiUsluga.ToList();
-                if (pruzateljiUsluga == null || !pruzateljiUsluga.Any())
-                    return NoContent();
+                var lista = _context.PruzateljiUsluga
+                    .Include(pu => pu.Usluga)
+                    .ToList();
 
-                return Ok(pruzateljiUsluga);
+                if (lista == null || lista.Count == 0)
+                {
+                    return BadRequest("Ne postoje pruzatelji usluga u bazi");
+                }
+
+                return new JsonResult(lista.MapPruzateljUslugeReadList());
             }
             catch (Exception ex)
             {
@@ -37,34 +44,58 @@ namespace UslugeZaKucneLjubimce.Controllers
             }
         }
 
-        [HttpGet("{id:int}")]
-        public IActionResult GetById(int id)
+
+        [HttpGet]
+        [Route("{sifra:int}")]
+        public IActionResult GetBySifra(int sifra)
         {
+            if (!ModelState.IsValid || sifra <= 0)
+            {
+                return BadRequest(ModelState);
+            }
+
             try
             {
-                var pruzateljUsluge = _context.PruzateljiUsluga.Find(id);
-                if (pruzateljUsluge == null)
-                    return NoContent();
+                var u = _context.PruzateljiUsluga.Include(i => i.Usluga).FirstOrDefault(x => x.Sifra == sifra);
 
-                return Ok(pruzateljUsluge);
+                if (u == null)
+                {
+                    return BadRequest("Ne postoji pruzatelj usluge s šifrom " + sifra + " u bazi");
+                }
+
+                return new JsonResult(u.MapPruzateljUslugeInsertUpdatedToDTO());
             }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, ex.Message);
             }
         }
+
 
         [HttpPost]
-        public IActionResult Post(PruzateljUsluge pruzateljUsluge)
+        public IActionResult Post(PruzateljUslugeDTOInsertUpdate pruzateljUslugeDTO)
         {
-            if (!ModelState.IsValid || pruzateljUsluge == null)
+            if (!ModelState.IsValid || pruzateljUslugeDTO == null)
+            {
                 return BadRequest();
+            }
+
+            var usluga = _context.Usluge.Find(pruzateljUslugeDTO.uslugaSifra);
+
+            if (usluga == null)
+            {
+                return BadRequest();
+            }
+
+            var entitet = pruzateljUslugeDTO.MapPruzateljUslugeInsertUpdateFromDTO(new PruzateljUsluge());
+            entitet.Usluga = usluga;
 
             try
             {
-                _context.PruzateljiUsluga.Add(pruzateljUsluge);
+                _context.PruzateljiUsluga.Add(entitet);
                 _context.SaveChanges();
-                return StatusCode(StatusCodes.Status201Created, pruzateljUsluge);
+
+                return StatusCode(StatusCodes.Status201Created, entitet.MapPruzateljUslugeReadToDTO());
             }
             catch (Exception ex)
             {
@@ -72,26 +103,39 @@ namespace UslugeZaKucneLjubimce.Controllers
             }
         }
 
-        [HttpPut("{id:int}")]
-        public IActionResult Put(int id, PruzateljUsluge pruzateljUsluge)
+
+        [HttpPut]
+        [Route("{sifra:int}")]
+        public IActionResult Put(int sifra, PruzateljUslugeDTOInsertUpdate pruzateljUslugeDTO)
         {
-            if (id <= 0 || !ModelState.IsValid || pruzateljUsluge == null)
+            if (sifra <= 0 || !ModelState.IsValid || pruzateljUslugeDTO == null)
+            {
                 return BadRequest();
+            }
 
             try
             {
-                var existingPruzateljUsluge = _context.PruzateljiUsluga.Find(id);
-                if (existingPruzateljUsluge == null)
-                    return NotFound();
+                var entitet = _context.PruzateljiUsluga.Include(i => i.Usluga).FirstOrDefault(x => x.Sifra == sifra);
 
-                existingPruzateljUsluge.Ime = pruzateljUsluge.Ime;
-                existingPruzateljUsluge.Prezime = pruzateljUsluge.Prezime;
-                // Dodajte ostale atribute za ažuriranje
+                if (entitet == null)
+                {
+                    return BadRequest();
+                }
 
-                _context.PruzateljiUsluga.Update(existingPruzateljUsluge);
+                var usluga = _context.Usluge.Find(pruzateljUslugeDTO.uslugaSifra);
+
+                if (usluga == null)
+                {
+                    return BadRequest();
+                }
+
+                entitet = pruzateljUslugeDTO.MapPruzateljUslugeInsertUpdateFromDTO(entitet);
+                entitet.Usluga = usluga;
+
+                _context.PruzateljiUsluga.Update(entitet);
                 _context.SaveChanges();
 
-                return Ok(existingPruzateljUsluge);
+                return StatusCode(StatusCodes.Status200OK, entitet.MapPruzateljUslugeReadToDTO());
             }
             catch (Exception ex)
             {
@@ -99,27 +143,35 @@ namespace UslugeZaKucneLjubimce.Controllers
             }
         }
 
-        [HttpDelete("{id:int}")]
-        public IActionResult Delete(int id)
+
+        [HttpDelete]
+        [Route("{sifra:int}")]
+        public IActionResult Delete(int sifra)
         {
-            if (id <= 0)
+            if (!ModelState.IsValid || sifra <= 0)
+            {
                 return BadRequest();
+            }
 
             try
             {
-                var pruzateljUsluge = _context.PruzateljiUsluga.Find(id);
-                if (pruzateljUsluge == null)
-                    return NotFound();
+                var entitetIzBaze = _context.PruzateljiUsluga.Find(sifra);
 
-                _context.PruzateljiUsluga.Remove(pruzateljUsluge);
+                if (entitetIzBaze == null)
+                {
+                    return StatusCode(StatusCodes.Status204NoContent, sifra);
+                }
+
+                _context.PruzateljiUsluga.Remove(entitetIzBaze);
                 _context.SaveChanges();
 
-                return NoContent();
+                return new JsonResult(new { poruka = "Pružatelj usluge obrisan" });
             }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, ex.Message);
             }
         }
+
     }
 }

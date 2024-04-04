@@ -1,41 +1,39 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Microsoft.AspNetCore.Mvc;
 using UslugeZaKucneLjubimce.Data;
+using UslugeZaKucneLjubimce.Extensions;
 using UslugeZaKucneLjubimce.Models;
 
 namespace UslugeZaKucneLjubimce.Controllers
 {
-    /// <summary>
-    /// Namjenjeno za CRUD operacije nad entitetom usluga u bazi
-    /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class UslugeController : ControllerBase
+    public class UslugaController : ControllerBase
     {
         private readonly KucniLjubimciContext _context;
 
-        public UslugeController(KucniLjubimciContext context)
+        public UslugaController(KucniLjubimciContext context)
         {
             _context = context;
         }
 
-        /// <summary>
-        /// Dohvaća sve usluge iz baze
-        /// </summary>
+
         [HttpGet]
         public IActionResult Get()
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             try
             {
-                var usluge = _context.Usluge.ToList();
-                if (usluge == null || !usluge.Any())
-                    return NoContent();
+                var lista = _context.Usluge.ToList();
+                if (lista == null || lista.Count <= 0)
+                {
+                    return new EmptyResult();
+                }
 
-                return Ok(usluge);
+                return new JsonResult(lista.MapUslugaReadList());
             }
             catch (Exception ex)
             {
@@ -43,19 +41,25 @@ namespace UslugeZaKucneLjubimce.Controllers
             }
         }
 
-        /// <summary>
-        /// Dohvaća uslugu po šifri
-        /// </summary>
-        [HttpGet("{sifra:int}")]
+
+        [HttpGet]
+        [Route("{sifra:int}")]
         public IActionResult GetBySifra(int sifra)
         {
+            if (!ModelState.IsValid || sifra <= 0)
+            {
+                return BadRequest(ModelState);
+            }
+
             try
             {
                 var usluga = _context.Usluge.Find(sifra);
                 if (usluga == null)
-                    return NoContent();
+                {
+                    return new EmptyResult();
+                }
 
-                return Ok(usluga);
+                return new JsonResult(usluga.MapUslugaInsertUpdatedToDTO());
             }
             catch (Exception ex)
             {
@@ -63,20 +67,21 @@ namespace UslugeZaKucneLjubimce.Controllers
             }
         }
 
-        /// <summary>
-        /// Dodaje novu uslugu
-        /// </summary>
+
         [HttpPost]
-        public IActionResult Post(Usluga usluga)
+        public IActionResult Post(UslugaDTOInsertUpdate uslugaDTO)
         {
-            if (!ModelState.IsValid || usluga == null)
+            if (!ModelState.IsValid || uslugaDTO == null)
+            {
                 return BadRequest();
+            }
 
             try
             {
+                var usluga = uslugaDTO.MapUslugaInsertUpdateFromDTO(new Usluga());
                 _context.Usluge.Add(usluga);
                 _context.SaveChanges();
-                return StatusCode(StatusCodes.Status201Created, usluga);
+                return StatusCode(StatusCodes.Status201Created, usluga.MapUslugaReadToDTO());
             }
             catch (Exception ex)
             {
@@ -84,27 +89,30 @@ namespace UslugeZaKucneLjubimce.Controllers
             }
         }
 
-        /// <summary>
-        /// Mijenja podatke postojeće usluge
-        /// </summary>
-        [HttpPut("{sifra:int}")]
-        public IActionResult Put(int sifra, Usluga usluga)
+
+        [HttpPut]
+        [Route("{sifra:int}")]
+        public IActionResult Put(int sifra, UslugaDTOInsertUpdate uslugaDTO)
         {
-            if (sifra <= 0 || !ModelState.IsValid || usluga == null)
+            if (sifra <= 0 || !ModelState.IsValid || uslugaDTO == null)
+            {
                 return BadRequest();
+            }
 
             try
             {
-                var existingUsluga = _context.Usluge.Find(sifra);
-                if (existingUsluga == null)
-                    return NoContent();
+                var uslugaIzBaze = _context.Usluge.Find(sifra);
+                if (uslugaIzBaze == null)
+                {
+                    return StatusCode(StatusCodes.Status204NoContent, sifra);
+                }
 
-                existingUsluga.Naziv = usluga.Naziv; // Pretpostavljamo da samo mijenjamo naziv usluge
+                var usluga = uslugaDTO.MapUslugaInsertUpdateFromDTO(uslugaIzBaze);
 
-                _context.Usluge.Update(existingUsluga);
+                _context.Usluge.Update(usluga);
                 _context.SaveChanges();
 
-                return Ok(existingUsluga);
+                return StatusCode(StatusCodes.Status200OK, usluga.MapUslugaReadToDTO());
             }
             catch (Exception ex)
             {
@@ -112,25 +120,30 @@ namespace UslugeZaKucneLjubimce.Controllers
             }
         }
 
-        /// <summary>
-        /// Briše uslugu
-        /// </summary>
-        [HttpDelete("{sifra:int}")]
+
+        [HttpDelete]
+        [Route("{sifra:int}")]
+        [Produces("application/json")]
         public IActionResult Delete(int sifra)
         {
             if (!ModelState.IsValid || sifra <= 0)
+            {
                 return BadRequest();
+            }
 
             try
             {
-                var existingUsluga = _context.Usluge.Find(sifra);
-                if (existingUsluga == null)
-                    return NoContent();
+                var uslugaIzBaze = _context.Usluge.Find(sifra);
 
-                _context.Usluge.Remove(existingUsluga);
+                if (uslugaIzBaze == null)
+                {
+                    return StatusCode(StatusCodes.Status204NoContent, sifra);
+                }
+
+                _context.Usluge.Remove(uslugaIzBaze);
                 _context.SaveChanges();
 
-                return Ok(new { poruka = "Usluga obrisana" });
+                return new JsonResult(new { poruka = "Usluga obrisana" });
             }
             catch (Exception ex)
             {
