@@ -2,7 +2,7 @@ import { App } from "../constants"
 import { httpService } from "./httpService";
 
 async function get(){
-    return await httpService.get('/PruzateljUsluge')
+    return await httpService.get('/Klijent')
     .then((res)=> {
         if(App.DEV) console.table(res.data);
 
@@ -13,7 +13,7 @@ async function get(){
 }
 
 async function obrisi(sifra){
-    return await httpService.delete('/PruzateljUsluge/' + sifra)
+    return await httpService.delete('/Klijent/' + sifra)
     .then((res)=> {
 
         return {ok: true, poruka: res};
@@ -22,8 +22,8 @@ async function obrisi(sifra){
     });
 }
 
-async function dodaj(pruzateljusluge) {
-    const odgovor = await httpService.post('/PruzateljUsluge', pruzateljusluge)
+async function dodaj(klijent) {
+    const odgovor = await httpService.post('/Klijent', klijent)
     .then(()=>{
         return {ok: true, poruka: 'Uspješno dodano'}
     })
@@ -33,8 +33,8 @@ async function dodaj(pruzateljusluge) {
     return odgovor;
 }
 
-async function promjeni(sifra,pruzateljusluge) {
-    const odgovor = await httpService.put('/PruzateljUsluge/'+ sifra, pruzateljusluge)
+async function promjeni(sifra,klijent) {
+    const odgovor = await httpService.put('/Klijent/'+ sifra, klijent)
     .then(()=>{
         return {ok: true, poruka: 'Uspješno promijenjeno'}
     })
@@ -45,7 +45,7 @@ async function promjeni(sifra,pruzateljusluge) {
 }
 
 async function getBySifra(sifra){
-    return await httpService.get('/PruzateljUsluge/' + sifra)
+    return await httpService.get('/Klijent/' + sifra)
     .then((res)=>{
         if(App.DEV) console.table(res.data);
 

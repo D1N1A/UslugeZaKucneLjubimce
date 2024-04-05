@@ -10,6 +10,9 @@ import StatusiRezervacijaPromijeni from "./pages/statusirezervacija/StatusiRezer
 import PruzateljiUsluga from "./pages/pruzateljiusluga/PruzateljiUsluga"
 import PruzateljiUslugaDodaj from "./pages/pruzateljiusluga/PruzateljiUslugaDodaj"
 import PruzateljiUslugaPromijeni from "./pages/pruzateljiusluga/PruzateljiUslugaPromijeni"
+import Usluge from "./pages/usluge/Usluge"
+import UslugeDodaj from "./pages/usluge/UslugeDodaj"
+import UslugePromjeni from "./pages/usluge/UslugePromjeni"
 
 
 
@@ -22,12 +25,19 @@ function App () {
       <Routes>
         <>
         <Route path={RoutesNames.HOME} element={<Pocetna />} />
+
         <Route path={RoutesNames.STATUSIREZERVACIJA_PREGLED} element={<StatusiRezervacija />} />
         <Route path={RoutesNames.STATUSIREZERVACIJA_NOVI} element={<StatusiRezervacijaDodaj />} />
         <Route path={RoutesNames.STATUSIREZERVACIJA_PROMIJENI} element={<StatusiRezervacijaPromijeni />} />
+
+        <Route path={RoutesNames.USLUGE_PREGLED} element={<Usluge />} />
+        <Route path={RoutesNames.USLUGE_NOVI} element={<UslugeDodaj />} />
+        <Route path={RoutesNames.USLUGE_PROMJENI} element={<UslugePromjeni />} />
+
         <Route path={RoutesNames.PRUZATELJIUSLUGA_PREGLED} element={<PruzateljiUsluga />} />
         <Route path={RoutesNames.PRUZATELJIUSLUGA_NOVI} element={<PruzateljiUslugaDodaj />} />
         <Route path={RoutesNames.PRUZATELJIUSLUGA_PROMIJENI} element={<PruzateljiUslugaPromijeni />} />
+        
         </>
       </Routes>
     </>

@@ -1,41 +1,61 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Col, Container, Form, Row } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { RoutesNames } from "../../constants";
 import PruzateljUslugeService from "../../services/PruzateljUslugeService";
+import UslugaService from "../../services/UslugaService";
 
 export default function PruzateljiUslugaDodaj() {
     const navigate = useNavigate();
-    const [pruzateljusluge, setPruzateljUsluge] = useState(); 
 
-    async function dodajPruzateljUsluge(pruzateljusluge) {
-        const odgovor = await PruzateljUslugeService.dodajPruzateljUsluge(pruzateljusluge);
+    const [usluge, setUsluge] = useState([]);
+    const [uslugaSifra, setUslugaSifra] = useState(0);
+    
+    async function dohvatiUsluge() {
+        await UslugaService.get()
+            .then((odgovor) => {
+                setUsluge(odgovor.data);
+                setUslugaSifra(odgovor.data[0].sifra);
+            })
+    }
+
+    async function ucitaj(){
+        await dohvatiUsluge();
+      }
+    
+      useEffect(()=>{
+        ucitaj();
+      },[]);
+
+    async function dodaj(e) {
+        const odgovor = await PruzateljUslugeService.dodaj(e);
         if (odgovor.ok) {
             navigate(RoutesNames.PRUZATELJIUSLUGA_PREGLED);
         } else {
-            alert(odgovor.poruka);
+            alert(odgovor.poruka.errors);
         }
     }
 
     function handleSubmit(e) {
         e.preventDefault();
         const podaci = new FormData(e.target);
-        const statusrezervacije = {
+
+        const pruzateljUsluge = {
             ime: podaci.get('ime'),
             prezime: podaci.get('prezime'),
-            usluga: podaci.get('usluga'),
+            uslugaSifra: parseInt(uslugaSifra),
             telefon: podaci.get('telefon'),
             adresa: podaci.get('adresa'),
             eposta: podaci.get('eposta')      
         };
 
-        dodajPruzateljUsluge(statusrezervacije);
+        dodaj(pruzateljUsluge);
     }
 
     return (
         <Container>
             <Form onSubmit={handleSubmit}>
-                <Form.Group controlId="Ime">
+                <Form.Group controlId="ime">
                     <Form.Label>Ime</Form.Label>
                     <Form.Control
                         type="text"
@@ -43,7 +63,7 @@ export default function PruzateljiUslugaDodaj() {
                         placeholder="Unesite ime"
                     />
                 </Form.Group>
-                <Form.Group controlId="Prezime">
+                <Form.Group controlId="prezime">
                     <Form.Label>Prezime</Form.Label>
                     <Form.Control
                         type="text"
@@ -51,15 +71,22 @@ export default function PruzateljiUslugaDodaj() {
                         placeholder="Unesite prezime"
                     />
                 </Form.Group>
-                <Form.Group controlId="Usluga">
+                <Form.Group className="mb-3" controlId="usluga">
                     <Form.Label>Usluga</Form.Label>
-                    <Form.Control
-                        type="text"
-                        name="usluga"
-                        placeholder="Unesite uslugu"
-                    />
+                    <Form.Select
+                        onChange={(e) => {
+                            setUslugaSifra(e.target.value);
+                        }}
+                    >
+                        {usluge &&
+                            usluge.map((usluga, index) => (
+                                <option key={index} value={usluga.sifra}>
+                                    {usluga.naziv}
+                                </option>
+                            ))}
+                    </Form.Select>
                 </Form.Group>
-                <Form.Group controlId="Telefon">
+                <Form.Group controlId="telefon">
                     <Form.Label>Telefon</Form.Label>
                     <Form.Control
                         type="text"
@@ -67,7 +94,7 @@ export default function PruzateljiUslugaDodaj() {
                         placeholder="Unesite telefon"
                     />
                 </Form.Group>
-                <Form.Group controlId="Adresa">
+                <Form.Group controlId="adresa">
                     <Form.Label>Adresa</Form.Label>
                     <Form.Control
                         type="text"
@@ -86,10 +113,10 @@ export default function PruzateljiUslugaDodaj() {
                 
                 <Row className="Akcije">
                     <Col>
-                        <Link className="btn btn-danger" to={RoutesNames.STATUSIREZERVACIJA_PREGLED}>Odustani</Link>
+                        <Link className="btn btn-danger" to={RoutesNames.PRUZATELJIUSLUGA_PREGLED}>Odustani</Link>
                     </Col>
                     <Col>
-                        <Button variant="primary" type="submit">Dodaj smjer</Button>
+                        <Button variant="primary" type="submit">Dodaj pruzatelja usluge</Button>
                     </Col>
                 </Row>
             </Form>

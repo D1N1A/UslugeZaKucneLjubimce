@@ -24,8 +24,8 @@ function NavBar() {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
             <NavDropdown title="Izbornik" id="basic-nav-dropdown">
-              <NavDropdown.Item href="#action/3.1">Usluge</NavDropdown.Item>
-              <NavDropdown.Item href="#action/3.2">
+              <NavDropdown.Item onClick={() => navigate(RoutesNames.USLUGE_PREGLED)}>Usluge</NavDropdown.Item>
+              <NavDropdown.Item onClick={() => navigate(RoutesNames.PRUZATELJIUSLUGA_PREGLED)}>
                 Pružatelji usluga
               </NavDropdown.Item>
               {/* Koristite onClick za programsku navigaciju */}

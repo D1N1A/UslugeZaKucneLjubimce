@@ -1,7 +1,7 @@
 import { App } from "../constants"
 import { httpService } from "./httpService";
 
-async function getUsluge(){
+async function get(){
     return await httpService.get('/Usluga')
     .then((res)=> {
         if(App.DEV) console.table(res.data);
@@ -12,7 +12,7 @@ async function getUsluge(){
     });
 }
 
-async function obrisiUsluga(sifra){
+async function obrisi(sifra){
     return await httpService.delete('/Usluga/' + sifra)
     .then((res)=> {
 
@@ -22,7 +22,7 @@ async function obrisiUsluga(sifra){
     });
 }
 
-async function dodajUsluga(usluga) {
+async function dodaj(usluga) {
     const odgovor = await httpService.post('/Usluga', usluga)
     .then(()=>{
         return {ok: true, poruka: 'Uspješno dodano'}
@@ -33,8 +33,8 @@ async function dodajUsluga(usluga) {
     return odgovor;
 }
 
-async function promijeniUsluga(sifra,usluga) {
-    const odgovor = await httpService.put('/Usluga'+ sifra, usluga)
+async function promjeni(sifra,usluga) {
+    const odgovor = await httpService.put('/Usluga/'+ sifra, usluga)
     .then(()=>{
         return {ok: true, poruka: 'Uspješno promijenjeno'}
     })
@@ -61,10 +61,10 @@ async function getBySifra(sifra){
 
 
 export default{
-    getUsluge,
-    obrisiUsluga,
-    dodajUsluga,
-    promijeniUsluga,
+    get,
+    obrisi,
+    dodaj,
+    promjeni,
     getBySifra
   
 };

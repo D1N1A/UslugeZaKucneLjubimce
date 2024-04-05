@@ -1,30 +1,40 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Container, Table } from "react-bootstrap";
 import { TiDocumentAdd } from "react-icons/ti";
 import { CiEdit } from "react-icons/ci";
 import { MdDelete } from "react-icons/md";
 import { Link, useNavigate } from "react-router-dom"; 
-import PruzateljiUslugaService from "../../services/PruzateljUslugeServiceService";
 import { RoutesNames } from "../../constants";
+import PruzateljUslugeService from "../../services/PruzateljUslugeService";
 
 export default function PruzateljiUsluga() {
-    const [pruzateljiUsluga, setPruzateljUsluge] = useState([]);
+    const [pruzateljiUsluga, setPruzateljiUsluga] = useState([]);
     const navigate = useNavigate();
 
     async function dohvatiPruzateljeUsluga() {
-        try {
-            const res = await PruzateljiUslugaService.getPruzateljiUsluga();
-            setPruzateljUsluge(res.data);
-        } catch (error) {
-            alert(error);
-        }
+        await PruzateljUslugeService.get()
+            .then((res) => {
+                console.log(res.data);
+                setPruzateljiUsluga(res.data);
+            })
+            .catch((error) => {
+                alert(error);
+            });
     }
     
     useEffect(() => {
         dohvatiPruzateljeUsluga();
     }, []);
 
-
+    async function obrisiPruzateljaUsluge(sifra) {
+        const odgovor = await PruzateljUslugeService.obrisi(sifra);
+    
+        if (odgovor.ok) {
+            dohvatiPruzateljeUsluga();
+        } else {
+          alert(odgovor.poruka);
+        }
+      }
 
     return (
         <Container>
@@ -43,30 +53,29 @@ export default function PruzateljiUsluga() {
                     </tr>
                 </thead>
                 <tbody>
-                    {pruzateljiUsluga && pruzateljiUsluga.map((pruzateljusluge, index) => (
+                    {pruzateljiUsluga && pruzateljiUsluga.map((pruzateljUsluge, index) => (
                         <tr key={index}>
-                            <td className="sredina">{pruzateljusluge.ime}</td>
-                            <td className="sredina">{pruzateljusluge.prezime}</td>
-                            <td className="sredina">{pruzateljusluge.usluga}</td>
-                            <td className="sredina">{pruzateljusluge.telefon}</td>
-                            <td className="sredina">{pruzateljusluge.adresa}</td>
-                            <td className="sredina">{pruzateljusluge.eposta}</td>
+                            <td className="sredina">{pruzateljUsluge.ime}</td>
+                            <td className="sredina">{pruzateljUsluge.prezime}</td>
+                            <td className="sredina">{pruzateljUsluge.uslugaNaziv}</td>
+                            <td className="sredina">{pruzateljUsluge.telefon}</td>
+                            <td className="sredina">{pruzateljUsluge.adresa}</td>
+                            <td className="sredina">{pruzateljUsluge.eposta}</td>
                             <td className="sredina">
                                 <Button 
                                 variant=""
-                                onClick={()=>{navigate(`/pruzateljiusluga/${pruzateljusluge.sifra}`)}}>
+                                onClick={()=>{navigate(`/pruzateljiusluga/${pruzateljUsluge.sifra}`)}}>
                                     <CiEdit size={25} />
                                 </Button>
                                 &nbsp; &nbsp; &nbsp; 
                                 <Button
                                     variant="danger"
-                                    onClick={() => obrisiPruzateljUsluge(pruzateljusluge.sifra)}
+                                    onClick={() => obrisiPruzateljaUsluge(pruzateljUsluge.sifra)}
                                 >
                                     <MdDelete size={25} />
                                 </Button>
                             </td>
-                        </tr>
-                    ))}
+                        </tr>))}
                 </tbody>
             </Table>
         </Container>
