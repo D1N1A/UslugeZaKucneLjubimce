@@ -14,7 +14,7 @@ namespace UslugeZaKucneLjubimce.Mappers
                     .ConstructUsing(entitet =>
                     new KlijentDTORead(
                         entitet.Sifra,
-                        entitet.PruzateljUsluge == null ? "" : entitet.PruzateljUsluge.Ime + " " + entitet.PruzateljUsluge.Prezime,
+                        entitet.PruzateljUsluge == null ? "" : (entitet.PruzateljUsluge.Ime + " " + entitet.PruzateljUsluge.Prezime).Trim(),
                         entitet.ImeKlijenta,
                         entitet.Pasmina,
                         entitet.Napomena,
@@ -43,7 +43,7 @@ namespace UslugeZaKucneLjubimce.Mappers
                         entitet.PrezimeVlasnika,
                         entitet.Telefon,
                         entitet.ePosta,
-                        entitet.StatusRezervacije == null ? null : entitet.StatusRezervacije.Sifra)); ;
+                        entitet.StatusRezervacije == null ? null : entitet.StatusRezervacije.Sifra));
                 })
                 );
         }

@@ -8,11 +8,11 @@ namespace UslugeZaKucneLjubimce.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class Klijent : ControllerBase
+    public class KlijentController : ControllerBase
     {
         private readonly KucniLjubimciContext _context;
 
-        public Klijent(KucniLjubimciContext context)
+        public KlijentController(KucniLjubimciContext context)
         {
             _context = context;
         }
@@ -27,7 +27,7 @@ namespace UslugeZaKucneLjubimce.Controllers
 
             try
             {
-                var lista = _context.Klijent
+                var lista = _context.Klijenti
                     .Include(k => k.PruzateljUsluge)
                     .Include(k=> k.StatusRezervacije)
                     .ToList();
@@ -57,28 +57,10 @@ namespace UslugeZaKucneLjubimce.Controllers
 
             try
             {
-                var k = _context.Klijent.Include(i => i.Klijent).FirstOrDefault(x => x.Sifra == sifra);
-
-                if (k == null)
-                {
-                    return BadRequest("Ne postoji klijent sa šifrom " + sifra + " u bazi");
-                }
-
-                return new JsonResult(k.MapKlijentInsertUpdatedToDTO());
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, ex.Message);
-            }
-
-            if (!ModelState.IsValid || sifra <= 0)
-            {
-                return BadRequest(ModelState);
-            }
-
-            try
-            {
-                var k = _context.Klijent.Include(i => i.StatusRezervacije).FirstOrDefault(x => x.Sifra == sifra);
+                var k = _context.Klijenti
+                    .Include(i => i.PruzateljUsluge)
+                    .Include(i => i.StatusRezervacije)
+                    .FirstOrDefault(x => x.Sifra == sifra);
 
                 if (k == null)
                 {
@@ -97,21 +79,28 @@ namespace UslugeZaKucneLjubimce.Controllers
         [HttpPost]
         public IActionResult Post(KlijentDTOInsertUpdate klijentDTO)
         {
-            if (!ModelState.IsValid || KlijentDTO == null)
+            if (!ModelState.IsValid || klijentDTO == null)
             {
                 return BadRequest();
             }
 
-            var klijent
-                = _context.Klijent.Find(KlijentDTORead.;
+            var pruzateljUsluge = _context.PruzateljiUsluga.Find(klijentDTO.pruzateljSifra);
 
-            if (klijent == null)
+            if (pruzateljUsluge == null)
+            {
+                return BadRequest();
+            }
+
+            var statusRezervacije = _context.StatusiRezervacija.Find(klijentDTO.statusSifra);
+
+            if (statusRezervacije == null)
             {
                 return BadRequest();
             }
 
             var entitet = klijentDTO.MapKlijentInsertUpdateFromDTO(new Klijent());
-            entitet.klijent = klijent;
+            entitet.PruzateljUsluge = pruzateljUsluge;
+            entitet.StatusRezervacije = statusRezervacije;
 
             try
             {
@@ -138,22 +127,33 @@ namespace UslugeZaKucneLjubimce.Controllers
 
             try
             {
-                var entitet = _context.Klijenti.Include(i => i.Usluga).FirstOrDefault(x => x.Sifra == sifra);
+                var entitet = _context.Klijenti
+                    .Include(i => i.PruzateljUsluge)
+                    .Include(i => i.StatusRezervacije)
+                    .FirstOrDefault(x => x.Sifra == sifra);
 
                 if (entitet == null)
                 {
                     return BadRequest();
                 }
 
-                var usluga = _context.Usluge.Find(klijentDTO.pruzateljSifra);
+                var pruzateljUsluge = _context.PruzateljiUsluga.Find(klijentDTO.pruzateljSifra);
 
-                if (usluga == null)
+                if (pruzateljUsluge == null)
+                {
+                    return BadRequest();
+                }
+
+                var statusRezervacije = _context.StatusiRezervacija.Find(klijentDTO.statusSifra);
+
+                if (statusRezervacije == null)
                 {
                     return BadRequest();
                 }
 
                 entitet = klijentDTO.MapKlijentInsertUpdateFromDTO(entitet);
-                entitet.Usluga = usluga;
+                entitet.PruzateljUsluge = pruzateljUsluge;
+                entitet.StatusRezervacije = statusRezervacije;
 
                 _context.Klijenti.Update(entitet);
                 _context.SaveChanges();

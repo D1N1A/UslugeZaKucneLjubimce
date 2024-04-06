@@ -11,7 +11,7 @@ namespace UslugeZaKucneLjubimce.Data
         public DbSet<StatusRezervacije> StatusiRezervacija { get; set; }
         public DbSet<Usluga> Usluge { get; set; }
         public DbSet<PruzateljUsluge> PruzateljiUsluga { get; set; }
-        public DbSet<Klijent> Klijent { get; set; }
+        public DbSet<Klijent> Klijenti { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // veza 1:n
