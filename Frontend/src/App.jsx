@@ -13,6 +13,9 @@ import PruzateljiUslugaPromijeni from "./pages/pruzateljiusluga/PruzateljiUsluga
 import Usluge from "./pages/usluge/Usluge"
 import UslugeDodaj from "./pages/usluge/UslugeDodaj"
 import UslugePromjeni from "./pages/usluge/UslugePromjeni"
+import Klijenti from "./pages/klijenti/Klijenti"
+import KlijentiDodaj from "./pages/klijenti/KlijentiDodaj"
+import KlijentiPromijeni from "./pages/klijenti/KlijentiPromijeni"
 
 
 
@@ -37,6 +40,10 @@ function App () {
         <Route path={RoutesNames.PRUZATELJIUSLUGA_PREGLED} element={<PruzateljiUsluga />} />
         <Route path={RoutesNames.PRUZATELJIUSLUGA_NOVI} element={<PruzateljiUslugaDodaj />} />
         <Route path={RoutesNames.PRUZATELJIUSLUGA_PROMIJENI} element={<PruzateljiUslugaPromijeni />} />
+
+        <Route path={RoutesNames.KLIJENTI_PREGLED} element={<Klijenti />} />
+        <Route path={RoutesNames.KLIJENTI_NOVI} element={<KlijentiDodaj />} />
+        <Route path={RoutesNames.KLIJENTI_PROMIJENI} element={<KlijentiPromijeni />} />
         
         </>
       </Routes>

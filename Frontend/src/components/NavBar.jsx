@@ -28,12 +28,12 @@ function NavBar() {
               <NavDropdown.Item onClick={() => navigate(RoutesNames.PRUZATELJIUSLUGA_PREGLED)}>
                 Pružatelji usluga
               </NavDropdown.Item>
-              {/* Koristite onClick za programsku navigaciju */}
+              {}
               <NavDropdown.Item onClick={() => navigate(RoutesNames.STATUSIREZERVACIJA_PREGLED)}>
                 Statusi rezervacija
               </NavDropdown.Item>
               <NavDropdown.Divider />
-              <NavDropdown.Item href="#action/3.4">
+              <NavDropdown.Item onClick={()=> navigate(RoutesNames.KLIJENTI_PREGLED)}>
                 Klijenti
               </NavDropdown.Item>
             </NavDropdown>
