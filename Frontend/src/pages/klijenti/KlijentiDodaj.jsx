@@ -46,8 +46,8 @@ export default function KlijentiDodaj() {
             imeklijenta: podaci.get('imeklijenta'),
             pasmina: podaci.get('pasmina'),
             napomena: podaci.get('napomena'),
-            imevlasnika: podaci.get('imeVlasnika'),
-            prezimevlasnika: podaci.get('prezimeVlasnika'),
+            imevlasnika: podaci.get('imevlasnika'),
+            prezimevlasnika: podaci.get('prezimevlasnika'),
             telefon: podaci.get('telefon'),
             eposta: podaci.get('eposta'), 
             statusSifra: 1    
@@ -81,21 +81,21 @@ export default function KlijentiDodaj() {
                     <Form.Label>Ime klijenta</Form.Label>
                     <Form.Control
                         type="text"
-                        name="ime"
+                        name="imeklijenta"
                     />
                 </Form.Group>
-                <Form.Group className="mb-3" controlId="usluga">
+                <Form.Group className="mb-3" controlId="pasmina">
                     <Form.Label>Pasmina</Form.Label>
                     <Form.Control
                         type="text"
-                        name="prezime"
+                        name="pasmina"
                     />
                 </Form.Group>
-                <Form.Group controlId="telefon">
+                <Form.Group controlId="napomena">
                     <Form.Label>Napomena</Form.Label>
                     <Form.Control
                         type="text"
-                        name="telefon"
+                        name="napomena"
                     />
                 </Form.Group></Col><Col><Form.Group controlId="imevlasnika">
                     <Form.Label>Ime vlasnika</Form.Label>
