@@ -16,7 +16,7 @@
     public record KlijentDTORead(int sifra, string? pruzateljImePrezime, string? uslugaNaziv, string? imeklijenta, string? pasmina, string? napomena, string? imevlasnika, string? prezimevlasnika, string? telefon, string? eposta, string? statusNaziv);
 
     public record KlijentDTOInsertUpdate(
-        int? pruzateljSifra, 
+        int? pruzateljSifra,
         string? imeklijenta, 
         string? pasmina, 
         string? napomena, 

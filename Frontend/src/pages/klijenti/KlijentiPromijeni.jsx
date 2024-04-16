@@ -34,6 +34,7 @@ export default function KlijentiPromjeni() {
         try {
             const odgovor = await KlijentService.getBySifra(routeParams.sifra);
             const klijentData = odgovor.data;
+            console.log(klijentData);
             setPruzateljUslugeSifra(klijentData.pruzateljSifra);
             setStatusRezervacijeSifra(klijentData.statusSifra);
             setKlijent(klijentData);
@@ -46,6 +47,7 @@ export default function KlijentiPromjeni() {
         await PruzateljUslugeService.get()
             .then((response) => {
                 setPruzateljiUsluga(response.data);
+
             })
             .catch((error) => console.log(error));
     }
@@ -202,7 +204,7 @@ export default function KlijentiPromjeni() {
                         <Link className="btn btn-danger" to={RoutesNames.KLIJENTI_PREGLED}>Odustani</Link>
                     </Col>
                     <Col>
-                        <Button variant="primary" type="submit">Dodaj klijenta</Button>
+                        <Button variant="primary" type="submit">Unesi promjenu</Button>
                     </Col>
                 </Row>
             </Form>

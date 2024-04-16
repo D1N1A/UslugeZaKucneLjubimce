@@ -69,7 +69,7 @@ namespace UslugeZaKucneLjubimce.Controllers
                     return BadRequest("Ne postoji klijent sa šifrom " + sifra + " u bazi");
                 }
 
-                return new JsonResult(k.MapKlijentReadToDTO());
+                return new JsonResult(k.MapKlijentInsertUpdatedToDTO());
             }
             catch (Exception ex)
             {
