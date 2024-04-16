@@ -30,14 +30,13 @@ namespace UslugeZaKucneLjubimce.Extensions
 
         public static Klijent MapKlijentInsertUpdateFromDTO(this KlijentDTOInsertUpdate dto, Klijent entitet)
         {
-
+            entitet.ImeKlijenta = dto.imeklijenta;
             entitet.Pasmina = dto.pasmina;
             entitet.Napomena = dto.napomena;
             entitet.ImeVlasnika = dto.imevlasnika;
             entitet.PrezimeVlasnika = dto.prezimevlasnika;
             entitet.Telefon = dto.telefon;
             entitet.ePosta = dto.eposta;
-
 
             return entitet;
         }

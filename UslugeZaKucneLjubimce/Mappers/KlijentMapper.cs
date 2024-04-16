@@ -15,6 +15,7 @@ namespace UslugeZaKucneLjubimce.Mappers
                     new KlijentDTORead(
                         entitet.Sifra,
                         entitet.PruzateljUsluge == null ? "" : (entitet.PruzateljUsluge.Ime + " " + entitet.PruzateljUsluge.Prezime).Trim(),
+                        entitet.PruzateljUsluge.Usluga == null ? "" : entitet.PruzateljUsluge.Usluga.Naziv,
                         entitet.ImeKlijenta,
                         entitet.Pasmina,
                         entitet.Napomena,

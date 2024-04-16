@@ -29,6 +29,7 @@ namespace UslugeZaKucneLjubimce.Controllers
             {
                 var lista = _context.Klijenti
                     .Include(k => k.PruzateljUsluge)
+                        .ThenInclude(pu => pu.Usluga)
                     .Include(k=> k.StatusRezervacije)
                     .ToList();
 
@@ -59,6 +60,7 @@ namespace UslugeZaKucneLjubimce.Controllers
             {
                 var k = _context.Klijenti
                     .Include(i => i.PruzateljUsluge)
+                        .ThenInclude(pu => pu.Usluga)
                     .Include(i => i.StatusRezervacije)
                     .FirstOrDefault(x => x.Sifra == sifra);
 
