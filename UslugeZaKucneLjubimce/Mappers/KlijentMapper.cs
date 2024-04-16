@@ -22,7 +22,7 @@ namespace UslugeZaKucneLjubimce.Mappers
                         entitet.PrezimeVlasnika,
                         entitet.Telefon,
                         entitet.ePosta,
-                        entitet.StatusRezervacije == null ? "" : entitet.StatusRezervacije.Stanje));
+                        entitet.StatusRezervacije == null ? "" : entitet.StatusRezervacije.StatusNaziv));
                 })
                 );
         }

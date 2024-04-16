@@ -1,8 +1,8 @@
 ﻿namespace UslugeZaKucneLjubimce.Models
 {
-    public record StatusRezervacijeDTORead(int sifra, bool pokazatelj, string stanje);
+    public record StatusRezervacijeDTORead(int sifra, string statusNaziv);
 
-    public record StatusRezervacijeDTOInsertUpdate(bool pokazatelj, string stanje);
+    public record StatusRezervacijeDTOInsertUpdate(string statusNaziv);
 
 
     public record UslugaDTORead(int sifra, string naziv);

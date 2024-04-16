@@ -142,7 +142,7 @@ namespace StatusiRezervacijaZaKucneLjubimce.Controllers
                 _context.StatusiRezervacija.Remove(statusRezervacijeIzBaze);
                 _context.SaveChanges();
 
-                return new JsonResult(new { poruka = "StatusRezervacije obrisana" });
+                return new JsonResult(new { poruka = "Status rezervacije obrisan" });
             }
             catch (Exception ex)
             {

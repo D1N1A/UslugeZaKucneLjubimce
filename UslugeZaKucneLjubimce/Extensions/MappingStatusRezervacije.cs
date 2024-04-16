@@ -30,8 +30,7 @@ namespace UslugeZaKucneLjubimce.Extensions
 
         public static StatusRezervacije MapStatusRezervacijeInsertUpdateFromDTO(this StatusRezervacijeDTOInsertUpdate dto, StatusRezervacije entitet)
         {
-            entitet.Pokazatelj = dto.pokazatelj;
-            entitet.Stanje = dto.stanje;
+            entitet.StatusNaziv = dto.statusNaziv;
 
             return entitet;
         }
