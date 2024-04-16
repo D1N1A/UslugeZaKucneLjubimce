@@ -29,9 +29,9 @@ function NavBar() {
                 Pružatelji usluga
               </NavDropdown.Item>
               {}
-              <NavDropdown.Item onClick={() => navigate(RoutesNames.STATUSIREZERVACIJA_PREGLED)}>
+              {/* <NavDropdown.Item onClick={() => navigate(RoutesNames.STATUSIREZERVACIJA_PREGLED)}>
                 Statusi rezervacija
-              </NavDropdown.Item>
+              </NavDropdown.Item> */}
               <NavDropdown.Divider />
               <NavDropdown.Item onClick={()=> navigate(RoutesNames.KLIJENTI_PREGLED)}>
                 Klijenti

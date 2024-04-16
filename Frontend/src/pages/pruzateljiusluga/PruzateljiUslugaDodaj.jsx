@@ -116,7 +116,7 @@ export default function PruzateljiUslugaDodaj() {
                         <Link className="btn btn-danger" to={RoutesNames.PRUZATELJIUSLUGA_PREGLED}>Odustani</Link>
                     </Col>
                     <Col>
-                        <Button variant="primary" type="submit">Dodaj pruzatelja usluge</Button>
+                        <Button variant="primary" type="submit">Dodaj klijenta</Button>
                     </Col>
                 </Row>
             </Form>

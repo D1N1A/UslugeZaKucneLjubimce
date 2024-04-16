@@ -60,16 +60,16 @@ export default function Klijenti() {
                 <tbody>
                     {Klijenti && Klijenti.map((klijent, index) => (
                         <tr key={index}>
-                            <td className="sredina">{klijent.usluge}</td>
-                            <td className="sredina">{klijent.pruzateljUsluge}</td>
-                            <td className="sredina">{klijent.imeKlijenta}</td>
+                            <td className="sredina">{klijent.uslugaNaziv}</td>
+                            <td className="sredina">{klijent.pruzateljImePrezime}</td>
+                            <td className="sredina">{klijent.imeklijenta}</td>
                             <td className="sredina">{klijent.pasmina}</td>
                             <td className="sredina">{klijent.napomena}</td>
-                            <td className="sredina">{klijent.imeVlasnika}</td>
-                            <td className="sredina">{klijent.prezimeVlasnika}</td>
+                            <td className="sredina">{klijent.imevlasnika}</td>
+                            <td className="sredina">{klijent.prezimevlasnika}</td>
                             <td className="sredina">{klijent.telefon}</td>
                             <td className="sredina">{klijent.eposta}</td>
-                            <td className="sredina">{klijent.statusiRezervacija}</td>
+                            <td className="sredina">{klijent.statusNaziv}</td>
                             <td className="sredina">
                                 <Button 
                                 variant=""
