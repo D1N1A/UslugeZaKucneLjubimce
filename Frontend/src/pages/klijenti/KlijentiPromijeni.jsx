@@ -16,17 +16,30 @@ export default function KlijentiPromjeni() {
     const [statusRezervacijeSifra, setStatusRezervacijeSifra] = useState(0);
     const [klijent, setKlijent] = useState({});
 
-    async function dohvatiKlijenta() {
-        const odgovor = await KlijentService.getBySifra(routeParams.sifra);
+    // async function dohvatiKlijent() {
+    //     const odgovor = await KlijentService.getBySifra(routeParams.sifra)
+    //     if (!odgovor.ok) {
+    //         alert(odgovor.podaci);
+    //         return;
+    //     }
+    //     let klijent = odgovor.podaci;
 
-        if (!odgovor.ok) {
-            alert(odgovor.podaci)
-            return;
+    //     setKlijent(klijent);
+    //     setPruzateljUslugeSifra(klijent.pruzateljSifra);
+    //     setStatusRezervacijeSifra(klijent.statusSifra);
+    // }
+
+
+    async function dohvatiKlijenta() {
+        try {
+            const odgovor = await KlijentService.getBySifra(routeParams.sifra);
+            const klijentData = odgovor.data;
+            setPruzateljUslugeSifra(klijentData.pruzateljSifra);
+            setStatusRezervacijeSifra(klijentData.statusSifra);
+            setKlijent(klijentData);
+        } catch (error) {
+            alert(error.poruka)
         }
-        let klijent = odgovor.podaci;
-        setKlijent(klijent);
-        setPruzateljUslugeSifra(klijent.pruzateljSifra);
-        setStatusRezervacijeSifra(klijent.statusSifra);
     }
 
     async function dohvatiPruzateljeUsluga() {
@@ -53,6 +66,7 @@ export default function KlijentiPromjeni() {
         await dohvatiPruzateljeUsluga();
         await dohvatiStatuseRezervacija();
         await dohvatiKlijenta();
+        // await dohvatiKlijent();
     }
 
     async function promjeni(e) {
@@ -71,6 +85,7 @@ export default function KlijentiPromjeni() {
 
         const klijent = {
             pruzateljSifra: parseInt(pruzateljUslugeSifra),
+            // pruzateljSifra: parseInt(podaci.get("pruzateljUslugeSifra")),
             imeklijenta: podaci.get('imeklijenta'),
             pasmina: podaci.get('pasmina'),
             napomena: podaci.get('napomena'),
@@ -79,9 +94,9 @@ export default function KlijentiPromjeni() {
             telefon: podaci.get('telefon'),
             eposta: podaci.get('eposta'),
             statusSifra: parseInt(statusRezervacijeSifra)
+            // statusSifra: parseInt(podaci.get("statusRezervacijeSifra"))
         };
 
-        console.log("klijent: ", klijent);
         promjeni(klijent);
     }
 
