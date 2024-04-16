@@ -19,13 +19,9 @@ import PruzateljiUslugaPromijeni from "./pages/pruzateljiusluga/PruzateljiUsluga
 
 import Klijenti from "./pages/klijenti/Klijenti"
 import KlijentiDodaj from "./pages/klijenti/KlijentiDodaj"
+import KlijentiPromijeni from "./pages/klijenti/KlijentiPromijeni"
 
-
-
-
-
-
-function App () {
+export default function App () {
   return (
     <>
       <NavBar />
@@ -47,7 +43,7 @@ function App () {
 
         <Route path={RoutesNames.KLIJENTI_PREGLED} element={<Klijenti />} />
         <Route path={RoutesNames.KLIJENTI_NOVI} element={<KlijentiDodaj />} />
-        {/* <Route path={RoutesNames.KLIJENTI_PROMIJENI} element={<KlijentiPromijeni />} /> */}
+        <Route path={RoutesNames.KLIJENTI_PROMIJENI} element={<KlijentiPromijeni />} />
         
         </>
       </Routes>
@@ -55,4 +51,3 @@ function App () {
   )
 }
 
-export default App
