@@ -1,6 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using UslugeZaKucneLjubimce.Data;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using UslugezaKucneLjubimce.Extensions;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,51 +15,39 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
-// prilagodba za dokumentaciju, èitati https://medium.com/geekculture/customizing-swagger-in-asp-net-core-5-2c98d03cbe52
-builder.Services.AddSwaggerGen(sgo =>
-{ // sgo je instanca klase SwaggerGenOptions
-  // èitati https://devintxcontent.blob.core.windows.net/showcontent/Speaker%20Presentations%20Fall%202017/Web%20API%20Best%20Practices.pdf
-    var o = new Microsoft.OpenApi.Models.OpenApiInfo()
-    {
-        Title = "Usluge za kuæne ljubimce API",
-        Version = "v1",
-        Contact = new Microsoft.OpenApi.Models.OpenApiContact()
-        {
-            Email = "bruno.plecas@gmail.com",
-            Name = "Bruno Pleèaš"
-        },
-        Description = "Ovo je dokumentacija za Usluge za kuæne ljubimce API",
-        License = new Microsoft.OpenApi.Models.OpenApiLicense()
-        {
-            Name = "Edukacijska licenca"
-        }
-    };
-    sgo.SwaggerDoc("v1", o);
-
-    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    sgo.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
-
-});
-
-// Svi se od svuda na sve moguæe naèine mogu spojitina naš API
-// Èitati https://code-maze.com/aspnetcore-webapi-best-practices/
-builder.Services.AddCors(opcije =>
-{
-    opcije.AddPolicy("CorsPolicy",
-        builder =>
-            builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
-    );
-
-});
-
+builder.Services.AddKucniLjubimciSwaggerGen();
+builder.Services.AddEdunovaCORS();
 
 // dodavanje baze podataka
 builder.Services.AddDbContext<KucniLjubimciContext>(o =>
     o.UseSqlServer(builder.Configuration.GetConnectionString(name: "KucniLjubimciContext"))
 );
 
+// Security
+builder.Services.AddAuthentication(x =>
+{
+    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(x =>
+{
+    x.TokenValidationParameters = new TokenValidationParameters
+    {
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("Moj kljuc koji je tajan i dovoljno dugaèak da se može koristiti")),
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = false
+    };
+});
+
+builder.Services.AddAuthorization();
+// End Security
+
+
 var app = builder.Build();
+
+
 
 // Configure the HTTP request pipeline.
 //if (app.Environment.IsDevelopment())
@@ -63,6 +56,7 @@ var app = builder.Build();
     // moguænost generiranja poziva rute u CMD i Powershell
     app.UseSwaggerUI(opcije =>
     {
+        opcije.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
         opcije.ConfigObject.
         AdditionalItems.Add("requestSnippetsEnabled", true);
     });
@@ -70,7 +64,10 @@ var app = builder.Build();
 
 app.UseHttpsRedirection();
 
+// Security
+app.UseAuthentication();
 app.UseAuthorization();
+// End Security
 
 app.MapControllers();
 app.UseStaticFiles();
@@ -78,9 +75,7 @@ app.UseStaticFiles();
 app.UseCors("CorsPolicy");
 
 app.UseDefaultFiles();
-
 app.UseDeveloperExceptionPage();
-
 app.MapFallbackToFile("index.html");
 
 app.Run();

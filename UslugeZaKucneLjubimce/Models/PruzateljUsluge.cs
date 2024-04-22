@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace UslugeZaKucneLjubimce.Models
 {
-    public class PruzateljUsluge : Entitet
+    public class PruzateljUsluge : Osoba
     {
         [Required(ErrorMessage = "Ime pružatelja usluge je obavezno")]
         public string? Ime { get; set; }
@@ -14,13 +14,11 @@ namespace UslugeZaKucneLjubimce.Models
         [ForeignKey("usluga")]
         public Usluga? Usluga { get; set; }
 
-        [Required(ErrorMessage = "Telefon pružatelja usluge je obavezan")]
-        public string? Telefon { get; set; }
 
         [Required(ErrorMessage = "Adresa pružatelja usluge je obavezna")]
         public string? Adresa { get; set; }
 
-        [EmailAddress(ErrorMessage = "Neispravna e-mail adresa")]
-        public string? Eposta { get; set; }
+     
+
     }
 }

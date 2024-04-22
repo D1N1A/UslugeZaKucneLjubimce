@@ -1,12 +1,12 @@
 SELECT name, collation_name FROM sys.databases;
 GO
 
-ALTER DATABASE db_aa599b_kucniljubimci SET SINGLE_USER WITH
+ALTER DATABASE db_aa7e4b_kucniljubimci SET SINGLE_USER WITH
 ROLLBACK IMMEDIATE;
 GO
-ALTER DATABASE db_aa599b_kucniljubimci COLLATE Croatian_CI_AS;
+ALTER DATABASE db_aa7e4b_kucniljubimci COLLATE Croatian_CI_AS;
 GO
-ALTER DATABASE db_aa599b_kucniljubimci SET MULTI_USER;
+ALTER DATABASE db_aa7e4b_kucniljubimci SET MULTI_USER;
 GO
 SELECT name, collation_name FROM sys.databases;
 GO
@@ -96,5 +96,4 @@ insert into klijenti (pruzateljusluge, imeklijenta, pasmina, napomena, imevlasni
 (5, 'Bella', 'Chihuahua', 'Mali pas', 'Ivan', 'Kralj', '123-456-7890', 'ivan.k@example.com', 2);
 
 insert into operateri (korisnickoime, lozinka) values
-('admin', 'admin123'),
-('user', 'user123');
+('admin', '$2a$12$HJ/SCUwrH3GgfSiNoB6fz.FUkQhcexM95WlDzN61XjPuLQkCkl0iO');

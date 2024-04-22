@@ -1,177 +1,138 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
 using UslugeZaKucneLjubimce.Data;
-using UslugeZaKucneLjubimce.Extensions;
+using UslugeZaKucneLjubimce.Mappers;
 using UslugeZaKucneLjubimce.Models;
 
 namespace UslugeZaKucneLjubimce.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class PruzateljUslugeController : ControllerBase
+    public class PruzateljUslugeController : KucniLjubimciController<PruzateljUsluge, PruzateljUslugeDTORead, PruzateljUslugeDTOInsertUpdate>
     {
-        private readonly KucniLjubimciContext _context;
-
-        public PruzateljUslugeController(KucniLjubimciContext context)
+        public PruzateljUslugeController(KucniLjubimciContext context) : base(context)
         {
-            _context = context;
-        }
-
-        [HttpGet]
-        public IActionResult Get()
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            try
-            {
-                var lista = _context.PruzateljiUsluga
-                    .Include(pu => pu.Usluga)
-                    .ToList();
-
-                if (lista == null || lista.Count == 0)
-                {
-                    return BadRequest("Ne postoje pruzatelji usluga u bazi");
-                }
-
-                return new JsonResult(lista.MapPruzateljUslugeReadList());
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, ex.Message);
-            }
+            DbSet = _context.PruzateljiUsluga;
+            _mapper = new MappingPruzateljUsluge();
         }
 
 
-        [HttpGet]
-        [Route("{sifra:int}")]
-        public IActionResult GetBySifra(int sifra)
+        protected override PruzateljUsluge PromjeniEntitet(PruzateljUslugeDTOInsertUpdate entitetDTO, PruzateljUsluge entitet)
         {
-            if (!ModelState.IsValid || sifra <= 0)
-            {
-                return BadRequest(ModelState);
-            }
+            var usluga = _context.Usluge.Find(entitetDTO.uslugaSifra) ?? throw new Exception("Ne postoji usluga sa šifrom: " + entitetDTO.uslugaSifra + " u bazi podataka.");
+            
+            entitet.Usluga= usluga;
+            entitet.Ime = entitetDTO.ime;
+            entitet.Prezime = entitetDTO.prezime;
+            entitet.Telefon=entitetDTO.telefon;
+            entitet.Adresa = entitetDTO.adresa;
+            entitet.ePosta=entitetDTO.eposta;
 
-            try
-            {
-                var u = _context.PruzateljiUsluga.Include(i => i.Usluga).FirstOrDefault(x => x.Sifra == sifra);
 
-                if (u == null)
-                {
-                    return BadRequest("Ne postoji pruzatelj usluge s šifrom " + sifra + " u bazi");
-                }
 
-                return new JsonResult(u.MapPruzateljUslugeInsertUpdatedToDTO());
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, ex.Message);
-            }
+            return entitet;
         }
 
 
-        [HttpPost]
-        public IActionResult Post(PruzateljUslugeDTOInsertUpdate pruzateljUslugeDTO)
+        protected override PruzateljUsluge NadiEntitet(int sifra)
         {
-            if (!ModelState.IsValid || pruzateljUslugeDTO == null)
+            var entitet = _context.PruzateljiUsluga
+                .Include(u=> u.Usluga)
+                .FirstOrDefault(x => x.Sifra == sifra);
+
+            if (entitet == null)
             {
-                return BadRequest();
+                throw new Exception("Ne postoji pružatelj usluge sa šifrom: " + sifra + " u bazi podataka.");
             }
 
-            var usluga = _context.Usluge.Find(pruzateljUslugeDTO.uslugaSifra);
+            return entitet;
+        }
 
+
+        protected override List<PruzateljUslugeDTORead> UcitajSve()
+        {
+            var lista = _context.PruzateljiUsluga
+                .Include(u => u.Usluga)
+                .ToList();
+
+            if (lista == null || lista.Count == 0)
+            {
+                throw new Exception("Nema podataka u bazi.");
+            }
+
+            return _mapper.MapReadList(lista);
+        }
+
+
+        protected override PruzateljUsluge KreirajEntitet(PruzateljUslugeDTOInsertUpdate entitetDTO)
+        {
+            var usluga = _context.Usluge.Find(entitetDTO.uslugaSifra);
             if (usluga == null)
             {
-                return BadRequest();
+                throw new Exception("Ne postoji usluga sa šifrom: " + usluga.Sifra + " u bazi podataka.");
             }
 
-            var entitet = pruzateljUslugeDTO.MapPruzateljUslugeInsertUpdateFromDTO(new PruzateljUsluge());
+            var entitet = _mapper.MapInsertUpdatedFromDTO(entitetDTO);
             entitet.Usluga = usluga;
 
-            try
-            {
-                _context.PruzateljiUsluga.Add(entitet);
-                _context.SaveChanges();
-
-                return StatusCode(StatusCodes.Status201Created, entitet.MapPruzateljUslugeReadToDTO());
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, ex.Message);
-            }
+            return entitet;
         }
 
 
-        [HttpPut]
-        [Route("{sifra:int}")]
-        public IActionResult Put(int sifra, PruzateljUslugeDTOInsertUpdate pruzateljUslugeDTO)
+        protected override void KontrolaBrisanje(PruzateljUsluge entitet)
         {
-            if (sifra <= 0 || !ModelState.IsValid || pruzateljUslugeDTO == null)
-            {
-                return BadRequest();
-            }
+            var lista = _context.Klijenti
+                .Include(x => x.PruzateljUsluge)
+                .Where(x => x.PruzateljUsluge.Sifra == entitet.Sifra)
+                .ToList();
 
-            try
+            if (lista != null && lista.Count() > 0)
             {
-                var entitet = _context.PruzateljiUsluga.Include(i => i.Usluga).FirstOrDefault(x => x.Sifra == sifra);
-
-                if (entitet == null)
+                StringBuilder sb = new StringBuilder();
+                sb.Append("Pružatelj usluge se ne može obrisati jer je preuzeo iduće klijente: ");
+                foreach (var e in lista)
                 {
-                    return BadRequest();
+                    sb.Append(e.ImeKlijenta).Append(", ");
                 }
 
-                var usluga = _context.Usluge.Find(pruzateljUslugeDTO.uslugaSifra);
-
-                if (usluga == null)
-                {
-                    return BadRequest();
-                }
-
-                entitet = pruzateljUslugeDTO.MapPruzateljUslugeInsertUpdateFromDTO(entitet);
-                entitet.Usluga = usluga;
-
-                _context.PruzateljiUsluga.Update(entitet);
-                _context.SaveChanges();
-
-                return StatusCode(StatusCodes.Status200OK, entitet.MapPruzateljUslugeReadToDTO());
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, ex.Message);
+                throw new Exception(sb.ToString().Substring(0, sb.ToString().Length - 2));
             }
         }
 
-
-        [HttpDelete]
-        [Route("{sifra:int}")]
-        public IActionResult Delete(int sifra)
+        [HttpPatch]
+        [Route("{sifraPruzateljUsluge:int}")]
+        public async Task<ActionResult> Patch(int sifraPruzateljUsluge, IFormFile datoteka)
         {
-            if (!ModelState.IsValid || sifra <= 0)
+            if (datoteka == null)
             {
-                return BadRequest();
+                return BadRequest("Datoteka nije postavljena");
             }
 
+            var entitetIzbaze = _context.PruzateljiUsluga.Find(sifraPruzateljUsluge);
+
+            if (entitetIzbaze == null)
+            {
+                return BadRequest("Ne postoji pružatelj usluge sa šifrom " + sifraPruzateljUsluge + " u bazi");
+            }
             try
             {
-                var entitetIzBaze = _context.PruzateljiUsluga.Find(sifra);
-
-                if (entitetIzBaze == null)
+                var ds = Path.DirectorySeparatorChar;
+                string dir = Path.Combine(Directory.GetCurrentDirectory()
+                    + ds + "wwwroot" + ds + "datoteke" + ds + "pruzatelji usluga");
+                if (!System.IO.Directory.Exists(dir))
                 {
-                    return StatusCode(StatusCodes.Status204NoContent, sifra);
+                    System.IO.Directory.CreateDirectory(dir);
                 }
-
-                _context.PruzateljiUsluga.Remove(entitetIzBaze);
-                _context.SaveChanges();
-
-                return new JsonResult(new { poruka = "Pružatelj usluge obrisan" });
+                var putanja = Path.Combine(dir + ds + sifraPruzateljUsluge + "_" + System.IO.Path.GetExtension(datoteka.FileName));
+                Stream fileStream = new FileStream(putanja, FileMode.Create);
+                await datoteka.CopyToAsync(fileStream);
+                return Ok("Datoteka pohranjena");
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, ex.Message);
+                return BadRequest(e.Message);
             }
         }
-
     }
 }

@@ -1,15 +1,18 @@
 ﻿using AutoMapper;
+using System.Text.RegularExpressions;
 using UslugeZaKucneLjubimce.Models;
 
 namespace UslugeZaKucneLjubimce.Mappers
 {
-    public class PruzateljUslugeMapper
+    public class MappingPruzateljUsluge : Mapping<PruzateljUsluge, PruzateljUslugeDTORead, PruzateljUslugeDTOInsertUpdate>
     {
-        public static Mapper InicijalizirajReadToDTO()
+
+        public MappingPruzateljUsluge()
         {
-            return new Mapper(
-                new MapperConfiguration(c =>
-                {
+            MapperMapReadToDTO = new Mapper(
+            new MapperConfiguration(c =>
+            {
+            
                     c.CreateMap<PruzateljUsluge, PruzateljUslugeDTORead>()
                     .ConstructUsing(entitet =>
                     new PruzateljUslugeDTORead(
@@ -19,15 +22,22 @@ namespace UslugeZaKucneLjubimce.Mappers
                         entitet.Usluga == null ? "" : entitet.Usluga.Naziv,
                         entitet.Telefon,
                         entitet.Adresa,
-                        entitet.Eposta));
+                        entitet.ePosta));
                 })
                 );
-        }
+        
 
-        public static Mapper InicijalizirajInsertUpdateToDTO()
-        {
-            return new Mapper(
+        MapperMapInsertUpdatedFromDTO = new Mapper(
                 new MapperConfiguration(c =>
+                {
+            c.CreateMap<PruzateljUslugeDTOInsertUpdate, PruzateljUsluge>();
+        })
+                );
+
+
+            MapperMapInsertUpdateToDTO = new Mapper(
+                 
+                   new MapperConfiguration(c =>
                 {
                     c.CreateMap<PruzateljUsluge, PruzateljUslugeDTOInsertUpdate>()
                     .ConstructUsing(entitet =>
@@ -37,7 +47,7 @@ namespace UslugeZaKucneLjubimce.Mappers
                         entitet.Usluga == null ? null : entitet.Usluga.Sifra,
                         entitet.Telefon,
                         entitet.Adresa,
-                        entitet.Eposta));
+                        entitet.ePosta));
                 })
                 );
         }

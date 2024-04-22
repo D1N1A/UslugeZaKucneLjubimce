@@ -1,4 +1,6 @@
-﻿namespace UslugeZaKucneLjubimce.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace UslugeZaKucneLjubimce.Models
 {
     public record StatusRezervacijeDTORead(int sifra, string statusNaziv);
 
@@ -9,11 +11,35 @@
 
     public record UslugaDTOInsertUpdate(string naziv);
 
-    public record PruzateljUslugeDTORead(int sifra, string? ime, string? prezime, string? uslugaNaziv, string? telefon, string? adresa, string? eposta);
+    public record PruzateljUslugeDTORead(
+        int sifra, 
+        string? ime, 
+        string? prezime, 
+        string? uslugaNaziv, 
+        string? telefon, 
+        string? adresa, 
+        string? eposta);
 
-    public record PruzateljUslugeDTOInsertUpdate(string? ime, string? prezime, int? uslugaSifra, string? telefon, string? adresa, string? eposta);
+    public record PruzateljUslugeDTOInsertUpdate(
+        string? ime, 
+        string? prezime, 
+        int? uslugaSifra, 
+        string? telefon, 
+        string? adresa, 
+        string? eposta);
 
-    public record KlijentDTORead(int sifra, string? pruzateljImePrezime, string? uslugaNaziv, string? imeklijenta, string? pasmina, string? napomena, string? imevlasnika, string? prezimevlasnika, string? telefon, string? eposta, string? statusNaziv);
+    public record KlijentDTORead(
+        int sifra, 
+        string? pruzateljImePrezime, 
+        string? uslugaNaziv, 
+        string? imeklijenta, 
+        string? pasmina, 
+        string? napomena, 
+        string? imevlasnika, 
+        string? prezimevlasnika, 
+        string? telefon, 
+        string? eposta, 
+        string? statusNaziv);
 
     public record KlijentDTOInsertUpdate(
         int? pruzateljSifra,
@@ -25,4 +51,12 @@
         string? telefon, 
         string? eposta, 
         int? statusSifra);
+
+
+
+public record OperaterDTO(
+    [Required(ErrorMessage = "Korisničko ime obavezno")]
+        string? korisnickoIme,
+    [Required(ErrorMessage = "Lozinka obavezno")]
+        string? password);
 }

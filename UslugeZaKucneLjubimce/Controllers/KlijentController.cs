@@ -1,202 +1,168 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
+
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
 using UslugeZaKucneLjubimce.Data;
-using UslugeZaKucneLjubimce.Extensions;
+using UslugeZaKucneLjubimce.Mappers;
 using UslugeZaKucneLjubimce.Models;
 
 namespace UslugeZaKucneLjubimce.Controllers
 {
+
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class KlijentController : ControllerBase
+    public class KlijentController : KucniLjubimciController<Klijent, KlijentDTORead, KlijentDTOInsertUpdate>
     {
-        private readonly KucniLjubimciContext _context;
-
-        public KlijentController(KucniLjubimciContext context)
+        public KlijentController(KucniLjubimciContext context) : base(context)
         {
-            _context = context;
+            DbSet = _context.Klijenti;
+            _mapper = new MappingKlijent();
         }
 
-        [HttpGet]
-        public IActionResult Get()
+        //[HttpGet]
+        //[Route("trazi/{uvjet}")]
+        //public IActionResult TraziKlijent(string uvjet)
+        //{
+
+
+        //    if (uvjet == null || uvjet.Length < 3)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
+
+
+        //    uvjet = uvjet.ToLower();
+        //    try
+        //    {
+        //        IEnumerable<Klijent> query = _context.Klijenti;
+        //        var niz = uvjet.Split(" ");
+
+        //        foreach (var s in uvjet.Split(" "))
+        //        {
+        //            query = query.Where(k => k.ImeKlijenta.ToLower().Contains(s) ||k.Pasmina.ToLower().Contains(s));
+        //        }
+
+
+        //        var klijenti = query.ToList();
+
+        //        return new JsonResult(_mapper.MapReadList(klijenti));
+
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return BadRequest(e.Message);
+        //    }
+        //}
+
+
+
+
+        //[HttpGet]
+        //[Route("traziStranicenje/{stranica}")]
+        //public IActionResult TraziKlijentaStranicenje(int stranica, string uvjet = "")
+        //{
+        //    var poStranici = 8;
+        //    uvjet = uvjet.ToLower();
+        //    try
+        //    {
+        //        var klijenti = _context.Klijenti
+        //            .Where(k => EF.Functions.Like(k.ImeKlijenta.ToLower(), "%" + uvjet + "%")
+        //                        || EF.Functions.Like(k.Pasmina.ToLower(), "%" + uvjet + "%"))
+        //            .Skip((poStranici * stranica) - poStranici)
+        //            .Take(poStranici)
+        //            .OrderBy(k => k.ImeKlijenta)
+        //            .ToList();
+
+
+        //        return new JsonResult(_mapper.MapReadList(klijenti));
+
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return BadRequest(e.Message);
+        //    }
+        //}
+
+
+        protected override Klijent PromjeniEntitet (KlijentDTOInsertUpdate entitetDTO, Klijent entitet)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            var pruzateljUsluge = _context.PruzateljiUsluga.Find(entitetDTO.pruzateljSifra) ?? throw new Exception("Ne postoji pružatelj usluga s ugovorenim klijentom: " + entitetDTO.pruzateljSifra + " u bazi podataka.");
+            var statusRezervacije = _context.StatusiRezervacija.Find(entitetDTO.statusSifra) ?? throw new Exception("Ne postoji status rezervacije s klijentom" + entitetDTO.statusSifra + "");
 
-            try
-            {
-                var lista = _context.Klijenti
-                    .Include(k => k.PruzateljUsluge)
-                        .ThenInclude(pu => pu.Usluga)
-                    .Include(k=> k.StatusRezervacije)
-                    .ToList();
+            entitet.PruzateljUsluge = pruzateljUsluge;
+            entitet.StatusRezervacije = statusRezervacije;
+            entitet.ImeKlijenta = entitetDTO.imeklijenta;
+            entitet.Pasmina=entitetDTO.pasmina;
+            entitet.Napomena=entitetDTO.napomena;
+            entitet.ImeVlasnika=entitetDTO.imevlasnika;
+            entitet.PrezimeVlasnika=entitetDTO.prezimevlasnika;
+            entitet.Telefon=entitetDTO.telefon;
+            entitet.ePosta=entitetDTO.eposta;
 
-                if (lista == null || lista.Count == 0)
-                {
-                    return BadRequest("Ne postojeklijenti u bazi");
-                }
 
-                return new JsonResult(lista.MapKlijentReadList());
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, ex.Message);
-            }
+
+            return entitet;
         }
 
 
-        [HttpGet]
-        [Route("{sifra:int}")]
-        public IActionResult GetBySifra(int sifra)
+        protected override Klijent NadiEntitet(int sifra)
         {
-            if (!ModelState.IsValid || sifra <= 0)
+            var entitet = _context.Klijenti
+                .Include(pu => pu.PruzateljUsluge)
+                .Include(sr => sr.StatusRezervacije)
+                .FirstOrDefault(x => x.Sifra == sifra);
+
+            if (entitet == null)
             {
-                return BadRequest(ModelState);
+                throw new Exception("Ne postoji klijent sa šifrom: " + sifra + " u bazi podataka.");
             }
 
-            try
-            {
-                var k = _context.Klijenti
-                    .Include(i => i.PruzateljUsluge)
-                        .ThenInclude(pu => pu.Usluga)
-                    .Include(i => i.StatusRezervacije)
-                    .FirstOrDefault(x => x.Sifra == sifra);
-
-                if (k == null)
-                {
-                    return BadRequest("Ne postoji klijent sa šifrom " + sifra + " u bazi");
-                }
-
-                return new JsonResult(k.MapKlijentInsertUpdatedToDTO());
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, ex.Message);
-            }
+            return entitet;
         }
 
 
-        [HttpPost]
-        public IActionResult Post(KlijentDTOInsertUpdate klijentDTO)
+        protected override List<KlijentDTORead> UcitajSve()
         {
-            if (!ModelState.IsValid || klijentDTO == null)
+            var lista = _context.Klijenti
+                .Include(pu => pu.PruzateljUsluge)
+                .ThenInclude(u => u.Usluga)
+                .Include(sr => sr.StatusRezervacije)
+                .ToList();
+
+            if (lista == null || lista.Count == 0)
             {
-                return BadRequest();
+                throw new Exception("Nema podataka u bazi.");
             }
 
-            var pruzateljUsluge = _context.PruzateljiUsluga.Find(klijentDTO.pruzateljSifra);
+            return _mapper.MapReadList(lista);
+        }
 
+
+        protected override Klijent KreirajEntitet (KlijentDTOInsertUpdate entitetDTO)
+        {
+            var pruzateljUsluge = _context.PruzateljiUsluga.Find(entitetDTO.pruzateljSifra);
             if (pruzateljUsluge == null)
             {
-                return BadRequest();
+                throw new Exception("Ne postoji pružatelj usluge sa šifrom: " + pruzateljUsluge.Sifra + " u bazi podataka.");
             }
 
-            var statusRezervacije = _context.StatusiRezervacija.Find(klijentDTO.statusSifra);
-
+            var statusRezervacije = _context.StatusiRezervacija.Find(entitetDTO.statusSifra);
             if (statusRezervacije == null)
             {
-                return BadRequest();
+                throw new Exception("Ne postoji status rezervacije sa šifrom: " + statusRezervacije.Sifra + " u bazi podataka.");
             }
 
-            var entitet = klijentDTO.MapKlijentInsertUpdateFromDTO(new Klijent());
+            var entitet = _mapper.MapInsertUpdatedFromDTO(entitetDTO);
             entitet.PruzateljUsluge = pruzateljUsluge;
             entitet.StatusRezervacije = statusRezervacije;
 
-            try
-            {
-                _context.Klijenti.Add(entitet);
-                _context.SaveChanges();
-
-                return StatusCode(StatusCodes.Status201Created, entitet.MapKlijentReadToDTO());
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, ex.Message);
-            }
+            return entitet;
         }
 
-
-        [HttpPut]
-        [Route("{sifra:int}")]
-        public IActionResult Put(int sifra, KlijentDTOInsertUpdate klijentDTO)
+        protected override void KontrolaBrisanje(Klijent entitet)
         {
-            if (sifra <= 0 || !ModelState.IsValid || klijentDTO == null)
-            {
-                return BadRequest();
-            }
-
-            try
-            {
-                var entitet = _context.Klijenti
-                    .Include(i => i.PruzateljUsluge)
-                    .Include(i => i.StatusRezervacije)
-                    .FirstOrDefault(x => x.Sifra == sifra);
-
-                if (entitet == null)
-                {
-                    return BadRequest();
-                }
-
-                var pruzateljUsluge = _context.PruzateljiUsluga.Find(klijentDTO.pruzateljSifra);
-
-                if (pruzateljUsluge == null)
-                {
-                    return BadRequest();
-                }
-
-                var statusRezervacije = _context.StatusiRezervacija.Find(klijentDTO.statusSifra);
-
-                if (statusRezervacije == null)
-                {
-                    return BadRequest();
-                }
-
-                entitet = klijentDTO.MapKlijentInsertUpdateFromDTO(entitet);
-                entitet.PruzateljUsluge = pruzateljUsluge;
-                entitet.StatusRezervacije = statusRezervacije;
-
-                _context.Klijenti.Update(entitet);
-                _context.SaveChanges();
-
-                return StatusCode(StatusCodes.Status200OK, entitet.MapKlijentReadToDTO());
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, ex.Message);
-            }
         }
-
-
-        [HttpDelete]
-        [Route("{sifra:int}")]
-        public IActionResult Delete(int sifra)
-        {
-            if (!ModelState.IsValid || sifra <= 0)
-            {
-                return BadRequest();
-            }
-
-            try
-            {
-                var entitetIzBaze = _context.Klijenti.Find(sifra);
-
-                if (entitetIzBaze == null)
-                {
-                    return StatusCode(StatusCodes.Status204NoContent, sifra);
-                }
-
-                _context.Klijenti.Remove(entitetIzBaze);
-                _context.SaveChanges();
-
-                return new JsonResult(new { poruka = "Klijent obrisan" });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, ex.Message);
-            }
-        }
-
     }
 }
+

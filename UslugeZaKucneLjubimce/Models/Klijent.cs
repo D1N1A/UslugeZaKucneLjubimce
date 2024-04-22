@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace UslugeZaKucneLjubimce.Models
 {
-    public class Klijent : Entitet
+    public class Klijent : Osoba
     {
         
         [ForeignKey("pruzateljusluge")]
@@ -25,10 +25,6 @@ namespace UslugeZaKucneLjubimce.Models
         [Required(ErrorMessage = "Obavezno je unijeti prezime vlasnika")]
         public string PrezimeVlasnika { get; set; }
 
-        [Required(ErrorMessage = "Obavezan je unos telefonskog broja")]
-        public string Telefon {  get; set; }
-
-        public string? ePosta { get; set; }
 
         [Required(ErrorMessage = "Status rezervacije je obavezan")]
         [ForeignKey("statusrezervacije")]

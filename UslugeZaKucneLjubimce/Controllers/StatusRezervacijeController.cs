@@ -1,156 +1,43 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using UslugeZaKucneLjubimce.Controllers;
 using UslugeZaKucneLjubimce.Data;
-using UslugeZaKucneLjubimce.Extensions;
 using UslugeZaKucneLjubimce.Models;
+using System.Text;
+using Microsoft.EntityFrameworkCore;
 
-namespace StatusiRezervacijaZaKucneLjubimce.Controllers
+namespace UslugeZaKucneLjubimce.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class StatusRezervacijeController : ControllerBase
+    public class StatusRezervacijeController : KucniLjubimciController<StatusRezervacije, StatusRezervacijeDTORead, StatusRezervacijeDTOInsertUpdate>
     {
-        private readonly KucniLjubimciContext _context;
 
-        public StatusRezervacijeController(KucniLjubimciContext context)
+        public StatusRezervacijeController(KucniLjubimciContext context) : base(context)
         {
-            _context = context;
+            DbSet = _context.StatusiRezervacija;
         }
 
-        [HttpGet]
-        public IActionResult Get()
+        protected override void KontrolaBrisanje(StatusRezervacije entitet)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            var lista = _context.Klijenti
+                .Include(x => x.StatusRezervacije)
+                .Where(x => x.StatusRezervacije.Sifra == entitet.Sifra)
+                .Select(x => x.StatusRezervacije)
+                .Distinct()
+                .ToList();
 
-            try
+            if (lista != null && lista.Count() > 0)
             {
-                var lista = _context.StatusiRezervacija.ToList();
-                if (lista == null || lista.Count <= 0)
+                StringBuilder sb = new StringBuilder();
+                sb.Append("Status rezervacije se ne može obrisati jer je postavljen na klijentima: ");
+                foreach (var e in lista)
                 {
-                    return new EmptyResult();
+                    sb.Append(entitet.StatusNaziv).Append(", ");
                 }
 
-                return new JsonResult(lista.MapStatusRezervacijeReadList());
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, ex.Message);
+                throw new Exception(sb.ToString().Substring(0, sb.ToString().Length - 2));
             }
         }
-
-
-        [HttpGet]
-        [Route("{sifra:int}")]
-        public IActionResult GetBySifra(int sifra)
-        {
-            if (!ModelState.IsValid || sifra <= 0)
-            {
-                return BadRequest(ModelState);
-            }
-
-            try
-            {
-                var statusRezervacije = _context.StatusiRezervacija.Find(sifra);
-                if (statusRezervacije == null)
-                {
-                    return new EmptyResult();
-                }
-
-                return new JsonResult(statusRezervacije.MapStatusRezervacijeInsertUpdatedToDTO());
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, ex.Message);
-            }
-        }
-
-
-        [HttpPost]
-        public IActionResult Post(StatusRezervacijeDTOInsertUpdate statusRezervacijeDTO)
-        {
-            if (!ModelState.IsValid || statusRezervacijeDTO == null)
-            {
-                return BadRequest();
-            }
-
-            try
-            {
-                var statusRezervacije = statusRezervacijeDTO.MapStatusRezervacijeInsertUpdateFromDTO(new StatusRezervacije());
-                _context.StatusiRezervacija.Add(statusRezervacije);
-                _context.SaveChanges();
-                return StatusCode(StatusCodes.Status201Created, statusRezervacije.MapStatusRezervacijeReadToDTO());
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, ex.Message);
-            }
-        }
-
-
-        [HttpPut]
-        [Route("{sifra:int}")]
-        public IActionResult Put(int sifra, StatusRezervacijeDTOInsertUpdate statusRezervacijeDTO)
-        {
-            if (sifra <= 0 || !ModelState.IsValid || statusRezervacijeDTO == null)
-            {
-                return BadRequest();
-            }
-
-            try
-            {
-                var statusRezervacijeIzBaze = _context.StatusiRezervacija.Find(sifra);
-                if (statusRezervacijeIzBaze == null)
-                {
-                    return StatusCode(StatusCodes.Status204NoContent, sifra);
-                }
-
-                var statusRezervacije = statusRezervacijeDTO.MapStatusRezervacijeInsertUpdateFromDTO(statusRezervacijeIzBaze);
-
-                _context.StatusiRezervacija.Update(statusRezervacije);
-                _context.SaveChanges();
-
-                return StatusCode(StatusCodes.Status200OK, statusRezervacije.MapStatusRezervacijeReadToDTO());
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, ex.Message);
-            }
-        }
-
-
-        [HttpDelete]
-        [Route("{sifra:int}")]
-        [Produces("application/json")]
-        public IActionResult Delete(int sifra)
-        {
-            if (!ModelState.IsValid || sifra <= 0)
-            {
-                return BadRequest();
-            }
-
-            try
-            {
-                var statusRezervacijeIzBaze = _context.StatusiRezervacija.Find(sifra);
-
-                if (statusRezervacijeIzBaze == null)
-                {
-                    return StatusCode(StatusCodes.Status204NoContent, sifra);
-                }
-
-                _context.StatusiRezervacija.Remove(statusRezervacijeIzBaze);
-                _context.SaveChanges();
-
-                return new JsonResult(new { poruka = "Status rezervacije obrisan" });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, ex.Message);
-            }
-        }
-
-
 
     }
 }

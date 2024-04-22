@@ -1,16 +1,18 @@
 ﻿using AutoMapper;
+using System.Text.RegularExpressions;
 using UslugeZaKucneLjubimce.Models;
 
 namespace UslugeZaKucneLjubimce.Mappers
 {
-    public class KlijentMapper
+    public class MappingKlijent : Mapping<Klijent, KlijentDTORead, KlijentDTOInsertUpdate>
     {
-        public static Mapper InicijalizirajReadToDTO()
+
+        public MappingKlijent()
         {
-            return new Mapper(
-                new MapperConfiguration(c =>
-                {
-                    c.CreateMap<Klijent, KlijentDTORead>()
+            MapperMapReadToDTO = new Mapper(
+            new MapperConfiguration(c =>
+            {
+                c.CreateMap<Klijent, KlijentDTORead>()
                     .ConstructUsing(entitet =>
                     new KlijentDTORead(
                         entitet.Sifra,
@@ -26,16 +28,19 @@ namespace UslugeZaKucneLjubimce.Mappers
                         entitet.StatusRezervacije == null ? "" : entitet.StatusRezervacije.StatusNaziv));
                 })
                 );
-        }
+            MapperMapInsertUpdatedFromDTO = new Mapper(
+                   new MapperConfiguration(c =>
+                   {
+                       c.CreateMap<KlijentDTOInsertUpdate, Klijent>();
+                   })
+                   );
 
-        public static Mapper InicijalizirajInsertUpdateToDTO()
-        {
-            return new Mapper(
-                new MapperConfiguration(c =>
-                {
-                    c.CreateMap<Klijent, KlijentDTOInsertUpdate>()
-                    .ConstructUsing(entitet =>
-                    new KlijentDTOInsertUpdate(
+            MapperMapInsertUpdateToDTO = new Mapper(
+             new MapperConfiguration(c =>
+             {
+                 c.CreateMap<Klijent, KlijentDTOInsertUpdate>()
+                 .ConstructUsing(entitet =>
+                  new KlijentDTOInsertUpdate(
                         entitet.PruzateljUsluge == null ? null : entitet.PruzateljUsluge.Sifra,
                         entitet.ImeKlijenta,
                         entitet.Pasmina,
@@ -45,8 +50,12 @@ namespace UslugeZaKucneLjubimce.Mappers
                         entitet.Telefon,
                         entitet.ePosta,
                         entitet.StatusRezervacije == null ? null : entitet.StatusRezervacije.Sifra));
-                })
-                );
+                 ;
+             })
+             );
         }
+
+
+
     }
 }

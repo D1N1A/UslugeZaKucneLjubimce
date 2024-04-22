@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using UslugezaKucneLjubimce.Models;
 using UslugeZaKucneLjubimce.Models;
 namespace UslugeZaKucneLjubimce.Data
 {
@@ -12,6 +13,8 @@ namespace UslugeZaKucneLjubimce.Data
         public DbSet<Usluga> Usluge { get; set; }
         public DbSet<PruzateljUsluge> PruzateljiUsluga { get; set; }
         public DbSet<Klijent> Klijenti { get; set; }
+
+        public DbSet<Operater> Operateri { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // veza 1:n

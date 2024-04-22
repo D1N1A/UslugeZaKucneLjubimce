@@ -1,154 +1,43 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Text;
 using UslugeZaKucneLjubimce.Data;
-using UslugeZaKucneLjubimce.Extensions;
 using UslugeZaKucneLjubimce.Models;
 
 namespace UslugeZaKucneLjubimce.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class UslugaController : ControllerBase
+    public class UslugaController : KucniLjubimciController<Usluga, UslugaDTORead, UslugaDTOInsertUpdate>
     {
-        private readonly KucniLjubimciContext _context;
+       
 
-        public UslugaController(KucniLjubimciContext context)
+        public UslugaController(KucniLjubimciContext context) : base(context)
         {
-            _context = context;
+            DbSet = _context.Usluge;
         }
 
 
-        [HttpGet]
-        public IActionResult Get()
+        protected override void KontrolaBrisanje(Usluga entitet)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            var lista = _context.PruzateljiUsluga
+                .Include(x => x.Usluga)
+                .Where(x => x.Usluga.Sifra == entitet.Sifra)
+                .ToList();
 
-            try
+            if (lista != null && lista.Count > 0)
             {
-                var lista = _context.Usluge.ToList();
-                if (lista == null || lista.Count <= 0)
+                StringBuilder sb = new StringBuilder();
+                sb.Append("Usluga ne može biti obrisana jer je postavljena na pružateljima usluga: ");
+
+                foreach (var item in lista)
                 {
-                    return new EmptyResult();
+                    sb.Append(item.Ime).Append(" ").Append(item.Prezime).Append(", ");
                 }
 
-                return new JsonResult(lista.MapUslugaReadList());
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, ex.Message);
-            }
-        }
-
-
-        [HttpGet]
-        [Route("{sifra:int}")]
-        public IActionResult GetBySifra(int sifra)
-        {
-            if (!ModelState.IsValid || sifra <= 0)
-            {
-                return BadRequest(ModelState);
+                throw new Exception(sb.ToString().Substring(0, sb.ToString().Length - 2));
             }
 
-            try
-            {
-                var usluga = _context.Usluge.Find(sifra);
-                if (usluga == null)
-                {
-                    return new EmptyResult();
-                }
-
-                return new JsonResult(usluga.MapUslugaInsertUpdatedToDTO());
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, ex.Message);
-            }
-        }
-
-
-        [HttpPost]
-        public IActionResult Post(UslugaDTOInsertUpdate uslugaDTO)
-        {
-            if (!ModelState.IsValid || uslugaDTO == null)
-            {
-                return BadRequest();
-            }
-
-            try
-            {
-                var usluga = uslugaDTO.MapUslugaInsertUpdateFromDTO(new Usluga());
-                _context.Usluge.Add(usluga);
-                _context.SaveChanges();
-                return StatusCode(StatusCodes.Status201Created, usluga.MapUslugaReadToDTO());
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, ex.Message);
-            }
-        }
-
-
-        [HttpPut]
-        [Route("{sifra:int}")]
-        public IActionResult Put(int sifra, UslugaDTOInsertUpdate uslugaDTO)
-        {
-            if (sifra <= 0 || !ModelState.IsValid || uslugaDTO == null)
-            {
-                return BadRequest();
-            }
-
-            try
-            {
-                var uslugaIzBaze = _context.Usluge.Find(sifra);
-                if (uslugaIzBaze == null)
-                {
-                    return StatusCode(StatusCodes.Status204NoContent, sifra);
-                }
-
-                var usluga = uslugaDTO.MapUslugaInsertUpdateFromDTO(uslugaIzBaze);
-
-                _context.Usluge.Update(usluga);
-                _context.SaveChanges();
-
-                return StatusCode(StatusCodes.Status200OK, usluga.MapUslugaReadToDTO());
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, ex.Message);
-            }
-        }
-
-
-        [HttpDelete]
-        [Route("{sifra:int}")]
-        [Produces("application/json")]
-        public IActionResult Delete(int sifra)
-        {
-            if (!ModelState.IsValid || sifra <= 0)
-            {
-                return BadRequest();
-            }
-
-            try
-            {
-                var uslugaIzBaze = _context.Usluge.Find(sifra);
-
-                if (uslugaIzBaze == null)
-                {
-                    return StatusCode(StatusCodes.Status204NoContent, sifra);
-                }
-
-                _context.Usluge.Remove(uslugaIzBaze);
-                _context.SaveChanges();
-
-                return new JsonResult(new { poruka = "Usluga obrisana" });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, ex.Message);
-            }
         }
     }
 }
