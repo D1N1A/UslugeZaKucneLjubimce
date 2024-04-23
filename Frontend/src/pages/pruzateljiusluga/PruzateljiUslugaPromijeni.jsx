@@ -14,17 +14,15 @@ export default function PruzateljiUslugaDodaj() {
     const [uslugaSifra, setUslugaSifra] = useState(0);
 
     async function dohvatiPruzateljaUsluge() {
-        const odgovor = await PruzateljUslugeService.getBySifra(
-            routeParams.sifra
-        );
-
-        if (!odgovor.ok) {
-            alert(odgovor.podaci);
-            return;
+        try {
+            const odgovor = await PruzateljUslugeService.getBySifra(routeParams.sifra
+            );
+            const pruzateljData = odgovor.data;
+            setUslugaSifra(pruzateljData.uslugaSifra);
+            setPruzateljUsluge(pruzateljData);
+        } catch (error) {
+            alert(error.poruka)
         }
-        let pruzateljUsluge = odgovor.podaci;
-        setPruzateljUsluge(pruzateljUsluge);
-        setUslugaSifra(pruzateljUsluge.uslugaSifra);
     }
 
     async function dohvatiUsluge() {
@@ -35,8 +33,8 @@ export default function PruzateljiUslugaDodaj() {
     }
 
     async function ucitaj() {
-        await dohvatiUsluge();
         await dohvatiPruzateljaUsluge();
+        await dohvatiUsluge();
     }
 
     useEffect(() => {

@@ -6,19 +6,25 @@ import { MdDelete } from "react-icons/md";
 import { Link, useNavigate } from "react-router-dom"; 
 import { RoutesNames } from "../../constants";
 import KlijentService from "../../services/KlijentService";
+import useLoading from "../../hooks/useLoading";
 
 
 export default function Klijenti() {
     const [Klijenti, setKlijenti] = useState();
     const navigate = useNavigate();
 
+    const { showLoading, hideLoading } = useLoading();
+
     async function dohvatiKlijente() {
+        showLoading();
         await KlijentService.get()
             .then((res) => {
                 console.log(res.data);
+                hideLoading();
                 setKlijenti(res.data);
             })
             .catch((error) => {
+                hideLoading();
                 alert(error);
             });
     }
@@ -27,7 +33,7 @@ export default function Klijenti() {
         dohvatiKlijente();
     }, []);
 
-    async function obrisi(sifra) {
+    async function obrisiKlijenta(sifra) {
         const odgovor = await KlijentService.obrisi(sifra);
     
         if (odgovor.ok) {

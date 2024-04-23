@@ -1,5 +1,7 @@
 export const RoutesNames = {
     HOME: '/' ,
+
+    NADZORNA_PLOCA: '/nadzornaploca',
     // STATUSIREZERVACIJA_PREGLED: '/statusirezervacija',
     // STATUSIREZERVACIJA_NOVI: '/statusirezervacija/dodaj',
     // STATUSIREZERVACIJA_PROMIJENI: 'statusirezervacija/:sifra',
@@ -14,10 +16,13 @@ export const RoutesNames = {
 
     KLIJENTI_PREGLED: '/klijenti',
     KLIJENTI_NOVI: '/klijenti/dodaj',
-    KLIJENTI_PROMIJENI: '/klijenti/:sifra'
+    KLIJENTI_PROMIJENI: '/klijenti/:sifra',
+
+    LOGIN: '/login'
 
 };
 
 export const App = {
+    URL: 'https://stranica-001-site1.anytempurl.com',
     DEV: true
 };

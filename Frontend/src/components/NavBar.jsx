@@ -1,25 +1,26 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
-import { RoutesNames } from '../constants';
+import { useNavigate } from 'react-router-dom';
+import { RoutesNames, App } from '../constants';
 
 import './NavBar.css';
+import useAuth from '../hooks/useAuth';
 
 function NavBar() {
-  // 
-  const navigate = useNavigate();
+
+    const navigate = useNavigate();
+    const { logout, isLoggedIn } = useAuth();
 
   return (
     <Navbar expand="lg" className="bg-body-tertiary">
       <Container>
-        <Nav.Link onClick={() => navigate(RoutesNames.HOME)} className='linkPocetna'>
-          <Navbar.Brand>
+          <Navbar.Brand onClick={() => navigate(RoutesNames.HOME)} className='linkPocetna'>
             Usluge za kućne ljubimce APP
           </Navbar.Brand>
-        </Nav.Link>
+          {isLoggedIn ? (
+            <>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
@@ -37,8 +38,27 @@ function NavBar() {
                 Klijenti
               </NavDropdown.Item>
             </NavDropdown>
-          </Nav>
-        </Navbar.Collapse>
+
+            </Nav>
+            </Navbar.Collapse>
+            <Navbar.Collapse className="justify-content-end">
+                <Nav>
+                  <Nav.Link onClick={logout}>Odjava</Nav.Link>
+                  <Nav.Link target="_blank" href={App.URL + '/swagger/index.html'}>API dokumentacija</Nav.Link>
+                </Nav>
+              </Navbar.Collapse>
+          </>
+         ) : (
+          <>
+          <Navbar.Collapse className="justify-content-end">
+            <Nav.Link onClick={() => navigate(RoutesNames.LOGIN)}>
+              Prijava
+            </Nav.Link>
+          </Navbar.Collapse>
+          </>
+        )}
+        
+        
       </Container>
     </Navbar>
   );

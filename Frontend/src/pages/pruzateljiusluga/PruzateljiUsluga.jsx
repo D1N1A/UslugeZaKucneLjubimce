@@ -6,18 +6,24 @@ import { MdDelete } from "react-icons/md";
 import { Link, useNavigate } from "react-router-dom"; 
 import { RoutesNames } from "../../constants";
 import PruzateljUslugeService from "../../services/PruzateljUslugeService";
+import useLoading from "../../hooks/useLoading";
 
 export default function PruzateljiUsluga() {
     const [pruzateljiUsluga, setPruzateljiUsluga] = useState([]);
     const navigate = useNavigate();
 
+    const { showLoading, hideLoading } = useLoading();
+
     async function dohvatiPruzateljeUsluga() {
+        showLoading();
         await PruzateljUslugeService.get()
             .then((res) => {
                 console.log(res.data);
+                hideLoading();
                 setPruzateljiUsluga(res.data);
             })
             .catch((error) => {
+                hideLoading();
                 alert(error);
             });
     }

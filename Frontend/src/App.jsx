@@ -21,12 +21,28 @@ import Klijenti from "./pages/klijenti/Klijenti"
 import KlijentiDodaj from "./pages/klijenti/KlijentiDodaj"
 import KlijentiPromijeni from "./pages/klijenti/KlijentiPromijeni"
 
+import ErrorModal from './components/ErrorModal';
+import useError from "./hooks/useError"
+import LoadingSpinner from "./components/LoadingSpinner"
+import Login from "./pages/Login"
+import useAuth from "./hooks/useAuth"
+import NadzornaPloca from "./pages/NadzornaPloca"
+
+
+
 export default function App () {
+  const {errors, prikaziErrorModal, sakrijError} = useError();
+  const {isLoggedIn} = useAuth();
   return (
     <>
+      <LoadingSpinner />
+      <ErrorModal show={prikaziErrorModal} errors={errors} onHide={sakrijError} />
       <NavBar />
       <Routes>
+      <Route path={RoutesNames.HOME} element={<Pocetna />} />
+      {isLoggedIn ? (
         <>
+        <Route path={RoutesNames.NADZORNA_PLOCA} element={<NadzornaPloca />} />
         <Route path={RoutesNames.HOME} element={<Pocetna />} />
 
         {/* <Route path={RoutesNames.STATUSIREZERVACIJA_PREGLED} element={<StatusiRezervacija />} />
@@ -44,8 +60,12 @@ export default function App () {
         <Route path={RoutesNames.KLIJENTI_PREGLED} element={<Klijenti />} />
         <Route path={RoutesNames.KLIJENTI_NOVI} element={<KlijentiDodaj />} />
         <Route path={RoutesNames.KLIJENTI_PROMIJENI} element={<KlijentiPromijeni />} />
-        
         </>
+        ) : (
+          <>
+            <Route path={RoutesNames.LOGIN} element={<Login />} />
+          </>
+        )}
       </Routes>
     </>
   )

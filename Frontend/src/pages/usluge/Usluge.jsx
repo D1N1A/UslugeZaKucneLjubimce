@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Container, Table } from "react-bootstrap";
+import { Button, Card, Container, Table } from "react-bootstrap";
 import { GrValidate } from "react-icons/gr";
 import { TiDocumentAdd } from "react-icons/ti";
 import { CiEdit } from "react-icons/ci";
@@ -7,18 +7,24 @@ import { MdDelete } from "react-icons/md";
 import { Link, useNavigate } from "react-router-dom";
 import UslugaService from "../../services/UslugaService";
 import { RoutesNames } from "../../constants";
+import useLoading from "../../hooks/useLoading";
 
 export default function Usluge() {
     const [usluge, setUsluge] = useState();
     const navigate = useNavigate();
 
+    const { showLoading, hideLoading } = useLoading();
+
     async function dohvatiUsluge() {
+        showLoading();
         await UslugaService.get()
             .then((res) => {
                 console.log(res.data);
+                hideLoading();
                 setUsluge(res.data);
             })
             .catch((e) => {
+                hideLoading();
                 alert(e);
             });
     }
